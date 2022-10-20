@@ -1,2 +1,2 @@
-# Drawing-software
+# Painting
 Project for Java coursework
