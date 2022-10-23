@@ -3,8 +3,11 @@ package UI;
 import java.awt.*;
 
 import javax.swing.*;
+import java.awt.event.*;
+import java.awt.image.BufferStrategy;
 import java.util.*;
 
+import Shape.*;
 
 /**
  * @author LiuJiayuan
@@ -17,10 +20,19 @@ public class MainUI extends JFrame {
 
     private JToolBar _toolBar;
     private JButton _btnLine, _btnCurve, _btnTriangle, _btnRectangle, _btnRoundedRectangle,
-            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser,_colorViewer;
-    private Vector<JButton> _toolDrawBtnVec, _toolOptBtnVec;
+            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser, _colorViewer;
+    private Vector<JButton> _toolBtnVec;
+
 
     private Container _container;
+    private JPanel _canvasPanel;
+    private Canvas _canvas;
+
+    private Function _func;
+    private Graphics2D _graphics;
+    private Vertex[] _vertices;
+    private BufferStrategy _strategy;
+    private Vector<Shape2D> _shape2DVec;
 
     /**
      * 初始化窗口与控件
@@ -30,8 +42,11 @@ public class MainUI extends JFrame {
         InitSizeAndPos();
         InitMenuBar();
         InitToolBar();
+        InitCanvas();
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        InitBtnListener();
+        InitCanvasListener();
     }
 
     /**
@@ -44,119 +59,116 @@ public class MainUI extends JFrame {
         double width = screenDimension.getWidth();
         double height = screenDimension.getHeight();
         setSize((int) width * 3 / 4, (int) height * 3 / 4);
-        setLocation((int) (width - width * 3 / 4) / 2, (int) (height - height * 3 / 4) / 2);
+        setLocationRelativeTo(null);
     }
 
     /**
      * 初始化菜单栏
      */
     private void InitMenuBar() {
-        this._menuFile = new JMenu("File");
-        this._menuOperate = new JMenu("Operate");
-        this._menuView = new JMenu("View");
+        _menuFile = new JMenu("File");
+        _menuOperate = new JMenu("Operate");
+        _menuView = new JMenu("View");
 
-        this._menuOpen = new JMenuItem("Open");
-        this._menuSave = new JMenuItem("Save");
-        this._menuCancel = new JMenuItem("Cancel");
-        this._menuRedo = new JMenuItem("Redo");
-        this._menuZoomIn = new JMenuItem("ZoomIn");
-        this._menuZoomOut = new JMenuItem("ZoomOut");
+        _menuOpen = new JMenuItem("Open");
+        _menuSave = new JMenuItem("Save");
+        _menuCancel = new JMenuItem("Cancel");
+        _menuRedo = new JMenuItem("Redo");
+        _menuZoomIn = new JMenuItem("ZoomIn");
+        _menuZoomOut = new JMenuItem("ZoomOut");
 
-        this._menuFile.add(this._menuOpen);
-        this._menuFile.add(this._menuSave);
-        this._menuOperate.add(this._menuCancel);
-        this._menuOperate.add(this._menuRedo);
-        this._menuView.add(this._menuZoomIn);
-        this._menuView.add(this._menuZoomOut);
+        _menuFile.add(_menuOpen);
+        _menuFile.add(_menuSave);
+        _menuOperate.add(_menuCancel);
+        _menuOperate.add(_menuRedo);
+        _menuView.add(_menuZoomIn);
+        _menuView.add(_menuZoomOut);
 
-        this._menubar = new JMenuBar();
-        this._menubar.add(this._menuFile);
-        this._menubar.add(this._menuOperate);
-        this._menubar.add(this._menuView);
+        _menubar = new JMenuBar();
+        _menubar.add(_menuFile);
+        _menubar.add(_menuOperate);
+        _menubar.add(_menuView);
 
-        setJMenuBar(this._menubar);
+        setJMenuBar(_menubar);
     }
 
 
     private void InitToolBar() {
-        String[] _toolDrawBtnStr = {"Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
-                "Circle", "Polygon"};
-        String[] _toolOptBtnStr = {"Brush", "Eraser", "ColorChooser","ColorViewer"};
+        String[] _toolBtnStr = {"Eraser", "Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
+                "Circle", "Polygon", "ColorChooser", "ColorViewer"};
 
 
-        this._toolDrawBtnVec = new Vector<JButton>();
-        this._btnLine = new JButton();
-        this._toolDrawBtnVec.add(this._btnLine);
-        this._btnCurve = new JButton();
-        this._toolDrawBtnVec.add(this._btnCurve);
-        this._btnTriangle = new JButton();
-        this._toolDrawBtnVec.add(this._btnTriangle);
-        this._btnRectangle = new JButton();
-        this._toolDrawBtnVec.add(this._btnRectangle);
-        this._btnRoundedRectangle = new JButton();
-        this._toolDrawBtnVec.add(this._btnRoundedRectangle);
-        this._btnCircle = new JButton();
-        this._toolDrawBtnVec.add(this._btnCircle);
-        this._btnPolygon = new JButton();
-        this._toolDrawBtnVec.add(this._btnPolygon);
+        _toolBtnVec = new Vector<>();
+        //操作类
+        _btnEraser = new JButton();
+        _toolBtnVec.add(_btnEraser);
+        //绘图类
+        _btnBrush = new JButton();
+        _toolBtnVec.add(_btnBrush);
+        _btnLine = new JButton();
+        _toolBtnVec.add(_btnLine);
+        _btnCurve = new JButton();
+        _toolBtnVec.add(_btnCurve);
+        _btnTriangle = new JButton();
+        _toolBtnVec.add(_btnTriangle);
+        _btnRectangle = new JButton();
+        _toolBtnVec.add(_btnRectangle);
+        _btnRoundedRectangle = new JButton();
+        _toolBtnVec.add(_btnRoundedRectangle);
+        _btnCircle = new JButton();
+        _toolBtnVec.add(_btnCircle);
+        _btnPolygon = new JButton();
+        _toolBtnVec.add(_btnPolygon);
+        //颜色类
+        _btnColorChooser = new JButton();
+        _toolBtnVec.add(_btnColorChooser);
+        _colorViewer = new JButton("");
+        _toolBtnVec.add(_colorViewer);
 
-        for (int i = 0; i < this._toolDrawBtnVec.size(); i++) {
-            JButton btn = this._toolDrawBtnVec.get(i);
-            btn.setName(_toolDrawBtnStr[i]);
-            btn.setIcon(new ImageIcon("src/icon/" + _toolDrawBtnStr[i] + ".png"));
-        }
-
-        this._toolOptBtnVec = new Vector<JButton>();
-        this._btnBrush = new JButton();
-        this._toolOptBtnVec.add(this._btnBrush);
-        this._btnEraser = new JButton();
-        this._toolOptBtnVec.add(this._btnEraser);
-        this._btnColorChooser = new JButton();
-        this._toolOptBtnVec.add(this._btnColorChooser);
-        this._colorViewer= new JButton("");
-        this._toolOptBtnVec.add(this._colorViewer);
-
-        for (int i = 0; i < this._toolOptBtnVec.size(); i++) {
-            JButton btn = this._toolOptBtnVec.get(i);
-            btn.setName(_toolOptBtnStr[i]);
-            if(_toolOptBtnStr[i].equals("ColorViewer")){
+        for (int i = 0; i < _toolBtnVec.size(); i++) {
+            JButton btn = _toolBtnVec.get(i);
+            String functionName = Function.values()[i].toString();
+            if (functionName.equals("ColorViewer")) {
                 btn.setText("     ");
                 btn.setFont(new Font("宋体", 1, 30));
                 btn.setOpaque(true);
                 btn.setEnabled(false);
                 btn.setBackground(Color.black);
-            }
-            else
-                btn.setIcon(new ImageIcon("src/icon/" + _toolOptBtnStr[i] + ".png"));
+            } else {
+                btn.setText(functionName);
+                btn.setFont(new Font("宋体", 1, 0));
+                btn.setIcon(new ImageIcon("src/icon/" + _toolBtnStr[i] + ".png"));
 
+            }
         }
 
 
-        this._toolBar = new JToolBar("ToolBar");
+        _toolBar = new JToolBar("ToolBar");
 
-        this._toolBar.add(new JLabel("Tool"));
-        this._toolBar.addSeparator();
-        this._toolBar.add(this._btnBrush);
-        this._toolBar.add(this._btnEraser);
-        this._toolBar.addSeparator();
-        this._toolBar.add(new JLabel("Listener"));
-        this._toolBar.addSeparator();
-        this._toolBar.add(this._btnLine);
-        this._toolBar.add(this._btnCurve);
-        this._toolBar.add(this._btnTriangle);
-        this._toolBar.add(this._btnRectangle);
-        this._toolBar.add(this._btnRoundedRectangle);
-        this._toolBar.add(this._btnCircle);
-        this._toolBar.add(this._btnPolygon);
-        this._toolBar.addSeparator();
-        this._toolBar.add(new JLabel("Color Chooser"));
-        this._toolBar.addSeparator();
-        this._toolBar.add(this._btnColorChooser);
-        this._toolBar.addSeparator();
-        this._toolBar.add(new JLabel("Current Color"));
-        this._toolBar.addSeparator();
-        this._toolBar.add(this._colorViewer);
-        this._toolBar.addSeparator();
+        for (JButton btn : _toolBtnVec) {
+            switch (btn.getText()) {
+                case "Eraser" -> {
+                    _toolBar.add(new JLabel("Tool"));
+                    _toolBar.addSeparator();
+                }
+                case "Brush" -> {
+                    _toolBar.addSeparator();
+                    _toolBar.add(new JLabel("Draw"));
+                    _toolBar.addSeparator();
+                }
+                case "ColorChooser" -> {
+                    _toolBar.addSeparator();
+                    _toolBar.add(new JLabel("Color Chooser"));
+                    _toolBar.addSeparator();
+                }
+                case "ColorViewer" -> {
+                    _toolBar.addSeparator();
+                    _toolBar.add(new JLabel("Current Color"));
+                    _toolBar.addSeparator();
+                }
+            }
+            _toolBar.add(btn);
+        }
 
         _container = getContentPane();
         _container.setLayout(new BorderLayout());
@@ -164,7 +176,81 @@ public class MainUI extends JFrame {
 
     }
 
+    private void InitCanvas() {
+        _canvasPanel = new JPanel();
+        _canvasPanel.setLayout(new GridLayout());
+        _canvas = new Canvas();
+        _canvas.setBackground(Color.WHITE);
+        _canvas.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+        _canvasPanel.add(_canvas);
+        _container.add(_canvasPanel);
+
+        _shape2DVec = new Vector<>();
+        _func = Function.Line;
+    }
+
+    private void InitBtnListener() {
+        for (JButton btn : _toolBtnVec) {
+            btn.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    _func = Function.valueOf(e.getActionCommand());
+                    _vertices = new Vertex[Function.getVertexNum(_func)];
+                }
+            });
+        }
+    }
+
+    private void InitCanvasListener() {
+        _canvas.createBufferStrategy(2);
+        _strategy = _canvas.getBufferStrategy();
+        _graphics = (Graphics2D) _canvas.getGraphics();
+        _canvas.addMouseListener(new CanvasListener());
+        _canvas.addMouseMotionListener(new CanvasListener());
+    }
+
+    private class CanvasListener extends MouseAdapter {
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
+            utils.PressedSwitch(_vertices, _func, e.getX(), e.getY());
+        }
+
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+            utils.ReleasedSwitch(_vertices, _func, _shape2DVec);
+
+            for (Shape2D shape2D : _shape2DVec) {
+                _graphics.draw(shape2D.generatePath());
+            }
+
+
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            super.mouseDragged(e);
+            do {
+                do {
+                    Graphics2D graphics = (Graphics2D) _strategy.getDrawGraphics();
+                    graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
+
+                    for (Shape2D shape2D : _shape2DVec) {
+                        graphics.draw(shape2D.generatePath());
+                    }
+
+                    Shape2D shape2D = utils.DraggedSwitch(_vertices, _func, _shape2DVec, e.getX(), e.getY());
+                    graphics.draw(shape2D.generatePath());
+
+                    graphics.dispose();
+
+                } while (_strategy.contentsRestored());
+                _strategy.show();
+
+            } while (_strategy.contentsLost());
+        }
+    }
+
     public Color GetColor() {
-        return this._colorViewer.getBackground();
+        return _colorViewer.getBackground();
     }
 }
