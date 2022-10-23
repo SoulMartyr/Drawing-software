@@ -3,6 +3,8 @@ package UI;
 import java.awt.*;
 
 import javax.swing.*;
+import java.util.*;
+
 
 /**
  * @author LiuJiayuan
@@ -13,11 +15,10 @@ public class MainUI extends JFrame {
     private JMenu _menuFile, _menuOperate, _menuView;
     private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuZoomIn, _menuZoomOut;
 
-    private  JToolBar _toolBar;
-    private  JButton _btnLine,_btnCurve,_btnTriangle,_btnRectangle,_btnRoundedRectangle,
-            _btnCircle,_btnPolygon,_btnBrush,_btnEraser,_btnColorChooser;
-
-    private JLabel _colorLabel;
+    private JToolBar _toolBar;
+    private JButton _btnLine, _btnCurve, _btnTriangle, _btnRectangle, _btnRoundedRectangle,
+            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser,_colorViewer;
+    private Vector<JButton> _toolDrawBtnVec, _toolOptBtnVec;
 
     private Container _container;
 
@@ -66,7 +67,7 @@ public class MainUI extends JFrame {
         this._menuOperate.add(this._menuCancel);
         this._menuOperate.add(this._menuRedo);
         this._menuView.add(this._menuZoomIn);
-        this._menuView.add( this._menuZoomOut);
+        this._menuView.add(this._menuZoomOut);
 
         this._menubar = new JMenuBar();
         this._menubar.add(this._menuFile);
@@ -77,31 +78,59 @@ public class MainUI extends JFrame {
     }
 
 
-    private void InitToolBar(){
-        this._btnLine= new JButton();
-        this._btnLine.setIcon(new ImageIcon("src/icon/line.png"));
-        this._btnCurve= new JButton();
-        this._btnCurve.setIcon(new ImageIcon("src/icon/curve.png"));
-        this._btnTriangle= new JButton();
-        this._btnTriangle.setIcon(new ImageIcon("src/icon/triangle.png"));
+    private void InitToolBar() {
+        String[] _toolDrawBtnStr = {"Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
+                "Circle", "Polygon"};
+        String[] _toolOptBtnStr = {"Brush", "Eraser", "ColorChooser","ColorViewer"};
+
+
+        this._toolDrawBtnVec = new Vector<JButton>();
+        this._btnLine = new JButton();
+        this._toolDrawBtnVec.add(this._btnLine);
+        this._btnCurve = new JButton();
+        this._toolDrawBtnVec.add(this._btnCurve);
+        this._btnTriangle = new JButton();
+        this._toolDrawBtnVec.add(this._btnTriangle);
         this._btnRectangle = new JButton();
-        this._btnRectangle.setIcon(new ImageIcon("src/icon/rectangle.png"));
-        this._btnRoundedRectangle= new JButton();
-        this._btnRoundedRectangle.setIcon(new ImageIcon("src/icon/roundedrectangle.png"));
+        this._toolDrawBtnVec.add(this._btnRectangle);
+        this._btnRoundedRectangle = new JButton();
+        this._toolDrawBtnVec.add(this._btnRoundedRectangle);
         this._btnCircle = new JButton();
-        this._btnCircle.setIcon(new ImageIcon("src/icon/circle.png"));
-        this._btnPolygon =new JButton();
-        this._btnPolygon.setIcon(new ImageIcon("src/icon/polygon.png"));
+        this._toolDrawBtnVec.add(this._btnCircle);
+        this._btnPolygon = new JButton();
+        this._toolDrawBtnVec.add(this._btnPolygon);
+
+        for (int i = 0; i < this._toolDrawBtnVec.size(); i++) {
+            JButton btn = this._toolDrawBtnVec.get(i);
+            btn.setName(_toolDrawBtnStr[i]);
+            btn.setIcon(new ImageIcon("src/icon/" + _toolDrawBtnStr[i] + ".png"));
+        }
+
+        this._toolOptBtnVec = new Vector<JButton>();
         this._btnBrush = new JButton();
-        this._btnBrush.setIcon(new ImageIcon("src/icon/brush.png"));
-        this._btnEraser= new JButton();
-        this._btnEraser.setIcon(new ImageIcon("src/icon/eraser.png"));
+        this._toolOptBtnVec.add(this._btnBrush);
+        this._btnEraser = new JButton();
+        this._toolOptBtnVec.add(this._btnEraser);
         this._btnColorChooser = new JButton();
-        this._btnColorChooser.setIcon(new ImageIcon("src/icon/colorchooser.png"));
-        this._colorLabel = new JLabel("     ");
-        this._colorLabel.setFont(new Font("TimesRoman", 1, 32));
-        this._colorLabel.setOpaque(true);
-        this._colorLabel.setBackground(Color.black);
+        this._toolOptBtnVec.add(this._btnColorChooser);
+        this._colorViewer= new JButton("");
+        this._toolOptBtnVec.add(this._colorViewer);
+
+        for (int i = 0; i < this._toolOptBtnVec.size(); i++) {
+            JButton btn = this._toolOptBtnVec.get(i);
+            btn.setName(_toolOptBtnStr[i]);
+            if(_toolOptBtnStr[i].equals("ColorViewer")){
+                btn.setText("     ");
+                btn.setFont(new Font("宋体", 1, 30));
+                btn.setOpaque(true);
+                btn.setEnabled(false);
+                btn.setBackground(Color.black);
+            }
+            else
+                btn.setIcon(new ImageIcon("src/icon/" + _toolOptBtnStr[i] + ".png"));
+
+        }
+
 
         this._toolBar = new JToolBar("ToolBar");
 
@@ -110,7 +139,7 @@ public class MainUI extends JFrame {
         this._toolBar.add(this._btnBrush);
         this._toolBar.add(this._btnEraser);
         this._toolBar.addSeparator();
-        this._toolBar.add(new JLabel("Shape"));
+        this._toolBar.add(new JLabel("Listener"));
         this._toolBar.addSeparator();
         this._toolBar.add(this._btnLine);
         this._toolBar.add(this._btnCurve);
@@ -126,12 +155,16 @@ public class MainUI extends JFrame {
         this._toolBar.addSeparator();
         this._toolBar.add(new JLabel("Current Color"));
         this._toolBar.addSeparator();
-        this._toolBar.add(this._colorLabel);
+        this._toolBar.add(this._colorViewer);
         this._toolBar.addSeparator();
 
         _container = getContentPane();
         _container.setLayout(new BorderLayout());
-        _container.add(_toolBar,BorderLayout.NORTH);
+        _container.add(_toolBar, BorderLayout.NORTH);
 
+    }
+
+    public Color GetColor() {
+        return this._colorViewer.getBackground();
     }
 }
