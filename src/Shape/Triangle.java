@@ -2,12 +2,12 @@ package Shape;
 
 import java.awt.geom.GeneralPath;
 
-public class Line extends Shape2D {
-    public Line(Vertex[] vertices) {
+public class Triangle extends Shape2D {
+    public Triangle(Vertex[] vertices) {
         super(vertices);
     }
 
-    public Line(Vertex[] vertices, int verticesNum) {
+    public Triangle(Vertex[] vertices, int verticesNum) {
         super(vertices, verticesNum);
     }
 
@@ -18,11 +18,18 @@ public class Line extends Shape2D {
             path.moveTo(_vertices[0].getX(), _vertices[0].getY());
             path.lineTo(_vertices[1].getX(), _vertices[1].getY());
         }
+        if (_verticesNum == 3) {
+            path.moveTo(_vertices[0].getX(), _vertices[0].getY());
+            path.lineTo(_vertices[1].getX(), _vertices[1].getY());
+            path.lineTo(_vertices[2].getX(), _vertices[2].getY());
+            path.closePath();
+        }
         return path;
     }
 
+
     @Override
     public Shape2D cloneShape2D() {
-        return new Line(_vertices, _verticesNum);
+        return new Triangle(_vertices, _verticesNum);
     }
 }

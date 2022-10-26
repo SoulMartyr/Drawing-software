@@ -1,10 +1,10 @@
 package UI;
 
 import java.awt.*;
-
-import javax.swing.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;
+
+import javax.swing.*;
 import java.util.*;
 
 import Shape.*;
@@ -32,6 +32,7 @@ public class MainUI extends JFrame {
     private Graphics2D _graphics;
     private Vertex[] _vertices;
     private BufferStrategy _strategy;
+    private Shape2D _shape2D;
     private Vector<Shape2D> _shape2DVec;
 
     /**
@@ -179,9 +180,18 @@ public class MainUI extends JFrame {
     private void InitCanvas() {
         _canvasPanel = new JPanel();
         _canvasPanel.setLayout(new GridLayout());
-        _canvas = new Canvas();
+        _canvas = new Canvas() {
+            @Override
+            public void paint(Graphics g) {
+                g.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
+                Graphics2D g2D = (Graphics2D) g;
+                for (Shape2D shape2D : _shape2DVec) {
+                    g2D.draw(shape2D.generatePath());
+                }
+            }
+        };
         _canvas.setBackground(Color.WHITE);
-        _canvas.setPreferredSize(new Dimension(this.getWidth(), this.getHeight()));
+        _canvas.setSize(new Dimension(this.getWidth(), this.getHeight()));
         _canvasPanel.add(_canvas);
         _container.add(_canvasPanel);
 
@@ -194,8 +204,11 @@ public class MainUI extends JFrame {
             btn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+
                     _func = Function.valueOf(e.getActionCommand());
                     _vertices = new Vertex[Function.getVertexNum(_func)];
+
+                    _shape2D = utils.ActionSwitch(_vertices, _func);
                 }
             });
         }
@@ -207,39 +220,46 @@ public class MainUI extends JFrame {
         _graphics = (Graphics2D) _canvas.getGraphics();
         _canvas.addMouseListener(new CanvasListener());
         _canvas.addMouseMotionListener(new CanvasListener());
+
     }
 
     private class CanvasListener extends MouseAdapter {
+
+        @Override
         public void mousePressed(MouseEvent e) {
             super.mousePressed(e);
-            utils.PressedSwitch(_vertices, _func, e.getX(), e.getY());
+            if (_shape2D == null)
+                return;
+
+            utils.PressedSwitch(_shape2D, _func, e.getX(), e.getY());
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             super.mouseReleased(e);
-            utils.ReleasedSwitch(_vertices, _func, _shape2DVec);
+            if (_shape2D == null)
+                return;
 
-            for (Shape2D shape2D : _shape2DVec) {
-                _graphics.draw(shape2D.generatePath());
-            }
-
+            utils.ReleasedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
 
         }
 
         @Override
         public void mouseDragged(MouseEvent e) {
             super.mouseDragged(e);
+            if (_shape2D == null)
+                return;
             do {
                 do {
                     Graphics2D graphics = (Graphics2D) _strategy.getDrawGraphics();
-                    graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
 
+                    graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                     for (Shape2D shape2D : _shape2DVec) {
                         graphics.draw(shape2D.generatePath());
                     }
 
-                    Shape2D shape2D = utils.DraggedSwitch(_vertices, _func, _shape2DVec, e.getX(), e.getY());
-                    graphics.draw(shape2D.generatePath());
+                    utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
+                    graphics.draw(_shape2D.generatePath());
 
                     graphics.dispose();
 
@@ -248,9 +268,11 @@ public class MainUI extends JFrame {
 
             } while (_strategy.contentsLost());
         }
+
     }
 
     public Color GetColor() {
         return _colorViewer.getBackground();
     }
+
 }
