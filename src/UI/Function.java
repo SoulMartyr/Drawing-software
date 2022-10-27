@@ -9,8 +9,8 @@ public enum Function {
             case Brush, Eraser -> 1;
             case Line, Curve, Circle -> 2;
             case Triangle -> 3;
-            case Rectangle, RoundedRectangle -> 4;
-            case Polygon -> 5;
+            case Rectangle-> 4;
+            case RoundedRectangle ,Polygon -> 5;
             default -> 0;
         };
     }

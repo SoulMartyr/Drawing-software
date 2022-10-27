@@ -15,8 +15,7 @@ public class Triangle extends Shape2D {
     public GeneralPath generatePath() {
         GeneralPath path = new GeneralPath();
         if (_verticesNum == 2) {
-            path.moveTo(_vertices[0].getX(), _vertices[0].getY());
-            path.lineTo(_vertices[1].getX(), _vertices[1].getY());
+           path = new Line(_vertices,_verticesNum).generatePath();
         }
         if (_verticesNum == 3) {
             path.moveTo(_vertices[0].getX(), _vertices[0].getY());

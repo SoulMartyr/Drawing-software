@@ -1,6 +1,7 @@
 package Shape;
 
 import java.awt.geom.GeneralPath;
+import java.util.Arrays;
 
 public class Rectangle extends Shape2D {
     public Rectangle(Vertex[] vertices) {
@@ -15,8 +16,7 @@ public class Rectangle extends Shape2D {
     public GeneralPath generatePath() {
         GeneralPath path = new GeneralPath();
         if (_verticesNum == 2) {
-            path.moveTo(_vertices[0].getX(), _vertices[0].getY());
-            path.lineTo(_vertices[1].getX(), _vertices[1].getY());
+            path = new Line(_vertices,_verticesNum).generatePath();
         }
         if (_verticesNum == 4) {
             path.moveTo(_vertices[0].getX(), _vertices[0].getY());
@@ -36,6 +36,7 @@ public class Rectangle extends Shape2D {
     public Shape2D cloneShape2D() {
         return new Rectangle(_vertices, _verticesNum);
     }
+
 
     private Vertex calThirdVerTex() {
         int x1 = _vertices[0].getX(), y1 = _vertices[0].getY();

@@ -231,7 +231,7 @@ public class MainUI extends JFrame {
             if (_shape2D == null)
                 return;
 
-            utils.PressedSwitch(_shape2D, _func, e.getX(), e.getY());
+            utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
         }
 
         @Override
