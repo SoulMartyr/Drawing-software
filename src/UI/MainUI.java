@@ -29,11 +29,11 @@ public class MainUI extends JFrame {
     private Canvas _canvas;
 
     private Function _func;
-    private Graphics2D _graphics;
     private Vector<Vertex> _vertices;
     private BufferStrategy _strategy;
     private Shape2D _shape2D;
     private Vector<Shape2D> _shape2DVec;
+    private Color _cvColor,_bgColor;
 
     /**
      * 初始化窗口与控件
@@ -95,14 +95,11 @@ public class MainUI extends JFrame {
 
 
     private void InitToolBar() {
-        String[] _toolBtnStr = {"Eraser", "Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
-                "Circle", "Polygon", "ColorChooser", "ColorViewer"};
+        String[] _toolBtnStr = {"Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
+                "Circle", "Polygon", "Eraser", "ColorChooser", "ColorViewer"};
 
 
         _toolBtnVec = new Vector<>();
-        //操作类
-        _btnEraser = new JButton();
-        _toolBtnVec.add(_btnEraser);
         //绘图类
         _btnBrush = new JButton();
         _toolBtnVec.add(_btnBrush);
@@ -120,6 +117,9 @@ public class MainUI extends JFrame {
         _toolBtnVec.add(_btnCircle);
         _btnPolygon = new JButton();
         _toolBtnVec.add(_btnPolygon);
+        //操作类
+        _btnEraser = new JButton();
+        _toolBtnVec.add(_btnEraser);
         //颜色类
         _btnColorChooser = new JButton();
         _toolBtnVec.add(_btnColorChooser);
@@ -139,7 +139,6 @@ public class MainUI extends JFrame {
                 btn.setText(functionName);
                 btn.setFont(new Font("宋体", 1, 0));
                 btn.setIcon(new ImageIcon("src/icon/" + _toolBtnStr[i] + ".png"));
-
             }
         }
 
@@ -148,13 +147,13 @@ public class MainUI extends JFrame {
 
         for (JButton btn : _toolBtnVec) {
             switch (btn.getText()) {
-                case "Eraser" -> {
-                    _toolBar.add(new JLabel("Tool"));
+                case "Brush" -> {
+                    _toolBar.add(new JLabel("Draw"));
                     _toolBar.addSeparator();
                 }
-                case "Brush" -> {
+                case "Eraser" -> {
                     _toolBar.addSeparator();
-                    _toolBar.add(new JLabel("Draw"));
+                    _toolBar.add(new JLabel("Tool"));
                     _toolBar.addSeparator();
                 }
                 case "ColorChooser" -> {
@@ -162,7 +161,7 @@ public class MainUI extends JFrame {
                     _toolBar.add(new JLabel("Color Chooser"));
                     _toolBar.addSeparator();
                 }
-                case "ColorViewer" -> {
+                case "     " -> {
                     _toolBar.addSeparator();
                     _toolBar.add(new JLabel("Current Color"));
                     _toolBar.addSeparator();
@@ -186,7 +185,7 @@ public class MainUI extends JFrame {
                 g.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                 Graphics2D g2D = (Graphics2D) g;
                 for (Shape2D shape2D : _shape2DVec) {
-                    g2D.draw(shape2D.generatePath());
+                    PaintShape2D(g2D,shape2D);
                 }
             }
         };
@@ -197,6 +196,8 @@ public class MainUI extends JFrame {
 
         _shape2DVec = new Vector<>();
         _func = Function.Line;
+        _cvColor = Color.BLACK;
+        _bgColor = Color.WHITE;
     }
 
     private void InitBtnListener() {
@@ -204,7 +205,6 @@ public class MainUI extends JFrame {
             btn.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-
                     _func = Function.valueOf(e.getActionCommand());
                     _vertices = new Vector<Vertex>(_func.getVerticesNum());
                     _shape2D = utils.ActionSwitch(_vertices, _func);
@@ -216,7 +216,6 @@ public class MainUI extends JFrame {
     private void InitCanvasListener() {
         _canvas.createBufferStrategy(2);
         _strategy = _canvas.getBufferStrategy();
-        _graphics = (Graphics2D) _canvas.getGraphics();
         _canvas.addMouseListener(new CanvasListener());
         _canvas.addMouseMotionListener(new CanvasListener());
 
@@ -254,11 +253,11 @@ public class MainUI extends JFrame {
 
                     graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                     for (Shape2D shape2D : _shape2DVec) {
-                        graphics.draw(shape2D.generatePath());
+                        PaintShape2D(graphics,shape2D);
                     }
 
                     utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
-                    graphics.draw(_shape2D.generatePath());
+                    PaintShape2D(graphics,_shape2D);
 
                     graphics.dispose();
 
@@ -273,5 +272,14 @@ public class MainUI extends JFrame {
     public Color GetColor() {
         return _colorViewer.getBackground();
     }
-
+    private void PaintShape2D(Graphics2D graphics2D,Shape2D shape2D){
+        graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        if(shape2D instanceof Eraser){
+            graphics2D.setColor(_bgColor);
+            graphics2D.draw(shape2D.generatePath());
+            graphics2D.setColor(_cvColor);
+        }
+        else
+            graphics2D.draw(shape2D.generatePath());
+    }
 }

@@ -31,6 +31,9 @@ public class utils {
             case Brush -> {
                 return new Brush(vertices);
             }
+            case Eraser -> {
+                return new Eraser(vertices);
+            }
         }
         return null;
     }
@@ -75,7 +78,7 @@ public class utils {
                 }
                 shape2D.AddVertex(x, y);
             }
-            case Brush -> {
+            case Brush,Eraser -> {
                 shape2D.AddVertex(x, y);
             }
         }
@@ -132,7 +135,7 @@ public class utils {
                     shape2D.clear();
                 }
             }
-            case Brush -> {
+            case Brush,Eraser -> {
                 shape2D.ChangeVertex(shape2D.GetVerticesNum() - 1, x, y);
                 shape2DVec.add(shape2D.cloneShape2D());
                 shape2D.clear();
@@ -170,7 +173,7 @@ public class utils {
             case Polygon -> {
                 shape2D.ChangeVertex(shape2D.GetVerticesNum() - 1, x, y);
             }
-            case Brush -> {
+            case Brush,Eraser -> {
                 shape2D.AddVertex(x, y);
             }
         }
