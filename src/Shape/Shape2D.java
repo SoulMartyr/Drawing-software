@@ -24,7 +24,7 @@ public class Shape2D  {
         return null;
     }
 
-    public void AddVertex(int index, int x, int y) {
+    public void AddVertex(int x, int y) {
         _verticesNum += 1;
         _vertices.add(new Vertex(x, y));
     }

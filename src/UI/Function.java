@@ -1,18 +1,23 @@
 package UI;
 
-public enum Function {
-    Eraser, Brush, Line, Curve, Triangle, Rectangle,
-    RoundedRectangle, Circle, Polygon, ColorChooser, ColorViewer;
+import java.util.HashMap;
+import java.util.Map;
 
-    public static int getVertexNum(Function function) {
-        return switch (function) {
-            case Line, Circle -> 2;
-            case Triangle, Curve -> 3;
-            case Rectangle -> 4;
-            case RoundedRectangle, Polygon -> 5;
-            case Brush, Eraser -> 100;
-            default -> 0;
-        };
+public enum Function {
+    Eraser(100), Brush(100), Line(2), Curve(3), Triangle(3), Rectangle(4),
+    RoundedRectangle(5), Circle(2), Polygon(5), ColorChooser(0), ColorViewer(0);
+    private int _verticesNum;
+
+    Function(int num) {
+        _verticesNum = num;
+    }
+
+    public int getVerticesNum() {
+        return _verticesNum;
+    }
+
+    public void setVerticesNum(int num) {
+        _verticesNum = num;
     }
 
 }

@@ -206,7 +206,7 @@ public class MainUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
 
                     _func = Function.valueOf(e.getActionCommand());
-                    _vertices = new Vector<Vertex>(Function.getVertexNum(_func));
+                    _vertices = new Vector<Vertex>(_func.getVerticesNum());
                     _shape2D = utils.ActionSwitch(_vertices, _func);
                 }
             });
