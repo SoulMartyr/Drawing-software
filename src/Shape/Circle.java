@@ -2,13 +2,12 @@ package Shape;
 
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
+import java.util.Vector;
 
 public class Circle extends Shape2D {
-    public Circle(Vertex[] vertices) {
-        super(vertices);
-    }
+    public Circle(Vector<Vertex> vertices) {super(vertices); }
 
-    public Circle(Vertex[] vertices, int verticesNum) {
+    public Circle(Vector<Vertex> vertices, int verticesNum) {
         super(vertices, verticesNum);
     }
 
@@ -16,9 +15,9 @@ public class Circle extends Shape2D {
     public GeneralPath generatePath() {
         Ellipse2D circle = new Ellipse2D.Double();
         if (_verticesNum == 2) {
-            double r = Vertex.calDistance(_vertices[0], _vertices[1]);
-            double x = _vertices[0].getX() - r;
-            double y = _vertices[0].getY() - r;
+            double r = Vertex.calDistance(_vertices.get(0), _vertices.get(1));
+            double x = _vertices.get(0).getX() - r;
+            double y = _vertices.get(0).getY() - r;
             circle.setFrame(x, y, 2 * r, 2 * r);
         }
 

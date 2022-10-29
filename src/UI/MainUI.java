@@ -30,7 +30,7 @@ public class MainUI extends JFrame {
 
     private Function _func;
     private Graphics2D _graphics;
-    private Vertex[] _vertices;
+    private Vector<Vertex> _vertices;
     private BufferStrategy _strategy;
     private Shape2D _shape2D;
     private Vector<Shape2D> _shape2DVec;
@@ -206,8 +206,7 @@ public class MainUI extends JFrame {
                 public void actionPerformed(ActionEvent e) {
 
                     _func = Function.valueOf(e.getActionCommand());
-                    _vertices = new Vertex[Function.getVertexNum(_func)];
-
+                    _vertices = new Vector<Vertex>(Function.getVertexNum(_func));
                     _shape2D = utils.ActionSwitch(_vertices, _func);
                 }
             });

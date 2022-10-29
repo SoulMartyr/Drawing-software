@@ -1,21 +1,22 @@
 package Shape;
 
 import java.awt.geom.GeneralPath;
+import java.util.Vector;
 
-public class Shape2D implements Cloneable {
-    protected Vertex[] _vertices;
+public class Shape2D  {
+    protected Vector<Vertex> _vertices;
     protected int _verticesNum;
 
     public Shape2D() {
         this(null, 0);
     }
 
-    public Shape2D(Vertex[] vertices) {
-        this(vertices.clone(), 0);
+    public Shape2D(Vector<Vertex> vertices) {
+        this(vertices, 0);
     }
 
-    public Shape2D(Vertex[] vertices, int verticesNum) {
-        _vertices = vertices.clone();
+    public Shape2D(Vector<Vertex> vertices, int verticesNum) {
+        _vertices = new Vector<>(vertices);
         _verticesNum = verticesNum;
     }
 
@@ -23,13 +24,13 @@ public class Shape2D implements Cloneable {
         return null;
     }
 
-    public void SetVertex(int index, int x, int y) {
+    public void AddVertex(int index, int x, int y) {
         _verticesNum += 1;
-        _vertices[index] = new Vertex(x, y);
+        _vertices.add(new Vertex(x, y));
     }
 
     public void ChangeVertex(int index, int x, int y) {
-        _vertices[index] = new Vertex(x, y);
+        _vertices.set(index,new Vertex(x, y));
     }
 
     public int GetVerticesNum() {
@@ -41,7 +42,7 @@ public class Shape2D implements Cloneable {
     }
 
     public void clear() {
-        _vertices = new Vertex[_verticesNum];
+        _vertices = new Vector<>(_verticesNum);
         _verticesNum = 0;
     }
 

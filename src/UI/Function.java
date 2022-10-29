@@ -6,11 +6,11 @@ public enum Function {
 
     public static int getVertexNum(Function function) {
         return switch (function) {
-            case Brush, Eraser -> 1;
-            case Line, Curve, Circle -> 2;
-            case Triangle -> 3;
-            case Rectangle-> 4;
-            case RoundedRectangle ,Polygon -> 5;
+            case Line, Circle -> 2;
+            case Triangle, Curve -> 3;
+            case Rectangle -> 4;
+            case RoundedRectangle, Polygon -> 5;
+            case Brush, Eraser -> 100;
             default -> 0;
         };
     }
