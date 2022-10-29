@@ -1,5 +1,6 @@
 package Shape;
 
+import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
@@ -8,9 +9,10 @@ public class QuadCurve extends Shape2D{
         super(vertices);
     }
 
-    public QuadCurve(Vector<Vertex> vertices, int verticesNum) {
-        super(vertices, verticesNum);
+    public QuadCurve(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
+        super(vertices, verticesNum, lineWidth, color);
     }
+
     @Override
     public GeneralPath generatePath() {
         GeneralPath path = new GeneralPath();
@@ -26,6 +28,6 @@ public class QuadCurve extends Shape2D{
     }
     @Override
     public Shape2D cloneShape2D() {
-        return new QuadCurve(_vertices, _verticesNum);
+        return new QuadCurve(_vertices, _verticesNum, _lineWidth, _color);
     }
 }

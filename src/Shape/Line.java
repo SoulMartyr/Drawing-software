@@ -1,5 +1,6 @@
 package Shape;
 
+import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
@@ -12,6 +13,9 @@ public class Line extends Shape2D {
         super(vertices, verticesNum);
     }
 
+    public Line(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
+        super(vertices, verticesNum, lineWidth, color);
+    }
 
     @Override
     public GeneralPath generatePath() {
@@ -25,6 +29,8 @@ public class Line extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Line(_vertices, _verticesNum);
+        return new Line(_vertices, _verticesNum,_lineWidth,_color);
     }
+
+
 }

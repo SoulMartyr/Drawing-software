@@ -20,7 +20,7 @@ public class MainUI extends JFrame {
 
     private JToolBar _toolBar;
     private JButton _btnLine, _btnCurve, _btnTriangle, _btnRectangle, _btnRoundedRectangle,
-            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser, _colorViewer;
+            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser, _colorViewer, _btnLineWidth;
     private Vector<JButton> _toolBtnVec;
 
 
@@ -33,7 +33,9 @@ public class MainUI extends JFrame {
     private BufferStrategy _strategy;
     private Shape2D _shape2D;
     private Vector<Shape2D> _shape2DVec;
-    private Color _cvColor,_bgColor;
+    private Color _cvColor, _bgColor;
+    private int _lineWidth;
+    private JButton _preBtn;
 
     /**
      * 初始化窗口与控件
@@ -96,8 +98,7 @@ public class MainUI extends JFrame {
 
     private void InitToolBar() {
         String[] _toolBtnStr = {"Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
-                "Circle", "Polygon", "Eraser", "ColorChooser", "ColorViewer"};
-
+                "Circle", "Polygon", "Eraser", "LineWidth", "ColorChooser", "ColorViewer"};
 
         _toolBtnVec = new Vector<>();
         //绘图类
@@ -120,6 +121,8 @@ public class MainUI extends JFrame {
         //操作类
         _btnEraser = new JButton();
         _toolBtnVec.add(_btnEraser);
+        _btnLineWidth = new JButton();
+        _toolBtnVec.add(_btnLineWidth);
         //颜色类
         _btnColorChooser = new JButton();
         _toolBtnVec.add(_btnColorChooser);
@@ -140,6 +143,7 @@ public class MainUI extends JFrame {
                 btn.setFont(new Font("宋体", 1, 0));
                 btn.setIcon(new ImageIcon("src/icon/" + _toolBtnStr[i] + ".png"));
             }
+            btn.setFocusPainted(false);
         }
 
 
@@ -185,7 +189,7 @@ public class MainUI extends JFrame {
                 g.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                 Graphics2D g2D = (Graphics2D) g;
                 for (Shape2D shape2D : _shape2DVec) {
-                    PaintShape2D(g2D,shape2D);
+                    PaintShape2D(g2D, shape2D);
                 }
             }
         };
@@ -196,20 +200,63 @@ public class MainUI extends JFrame {
 
         _shape2DVec = new Vector<>();
         _func = Function.Line;
+        _preBtn = _btnLine;
+
+
         _cvColor = Color.BLACK;
         _bgColor = Color.WHITE;
+        _lineWidth = 4;
     }
 
     private void InitBtnListener() {
         for (JButton btn : _toolBtnVec) {
-            btn.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    _func = Function.valueOf(e.getActionCommand());
-                    _vertices = new Vector<Vertex>(_func.getVerticesNum());
-                    _shape2D = utils.ActionSwitch(_vertices, _func);
+            switch (btn.getText()) {
+                case "Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
+                        "Circle", "Polygon", "Eraser" -> {
+                    btn.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            _func = Function.valueOf(e.getActionCommand());
+                            _vertices = new Vector<>(_func.getVerticesNum());
+                            _shape2D = utils.ActionSwitch(_vertices, _func);
+
+                            JButton lastBtn = (JButton) e.getSource();
+                            lastBtn.setEnabled(false);
+                            _preBtn.setEnabled(true);
+
+                            _preBtn = lastBtn;
+                        }
+
+                    });
                 }
-            });
+                case "LineWidth" -> {
+                    btn.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String strLineWidth = JOptionPane.showInputDialog(null, "LineWidth",
+                                    "Input LineWidth", JOptionPane.QUESTION_MESSAGE);
+                            if (strLineWidth != null){
+                                _lineWidth = Integer.parseInt(strLineWidth);
+                                _shape2D.SetLineWidth(_lineWidth);
+                            }
+
+                        }
+                    });
+                }
+                case "ColorChooser"->{
+                    btn.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            Color color=JColorChooser.showDialog(null,"Select a color",_cvColor);
+
+                            _cvColor = color;
+                            _colorViewer.setBackground(color);
+                            _shape2D.SetColor(_cvColor);
+                        }
+                    });
+                }
+            }
+
         }
     }
 
@@ -218,18 +265,28 @@ public class MainUI extends JFrame {
         _strategy = _canvas.getBufferStrategy();
         _canvas.addMouseListener(new CanvasListener());
         _canvas.addMouseMotionListener(new CanvasListener());
-
+        _btnLine.doClick();
+        _btnLine.setEnabled(false);
+        ;
     }
 
     private class CanvasListener extends MouseAdapter {
-
         @Override
         public void mousePressed(MouseEvent e) {
             super.mousePressed(e);
             if (_shape2D == null)
                 return;
 
+            _shape2D.SetLineWidth(_lineWidth);
+            if (_func == Function.Eraser)
+                _shape2D.SetColor(_bgColor);
+            else
+                _shape2D.SetColor(_cvColor);
+
+
             utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
+
+
         }
 
         @Override
@@ -253,11 +310,11 @@ public class MainUI extends JFrame {
 
                     graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                     for (Shape2D shape2D : _shape2DVec) {
-                        PaintShape2D(graphics,shape2D);
+                        PaintShape2D(graphics, shape2D);
                     }
 
                     utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
-                    PaintShape2D(graphics,_shape2D);
+                    PaintShape2D(graphics, _shape2D);
 
                     graphics.dispose();
 
@@ -269,17 +326,10 @@ public class MainUI extends JFrame {
 
     }
 
-    public Color GetColor() {
-        return _colorViewer.getBackground();
-    }
-    private void PaintShape2D(Graphics2D graphics2D,Shape2D shape2D){
+    private void PaintShape2D(Graphics2D graphics2D, Shape2D shape2D) {
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        if(shape2D instanceof Eraser){
-            graphics2D.setColor(_bgColor);
-            graphics2D.draw(shape2D.generatePath());
-            graphics2D.setColor(_cvColor);
-        }
-        else
-            graphics2D.draw(shape2D.generatePath());
+        graphics2D.setColor(shape2D.GetColor());
+        graphics2D.setStroke(new BasicStroke(shape2D.GetLineWidth()));
+        graphics2D.draw(shape2D.generatePath());
     }
 }

@@ -57,6 +57,7 @@ public class utils {
                     shape2DVec.remove(shape2DVec.size() - 1);
                 }
                 shape2D.AddVertex(x, y);
+                shape2D.AddVertex(x, y);
             }
             case RoundedRectangle -> {
                 if (shape2D.GetVerticesNum() == 0) {

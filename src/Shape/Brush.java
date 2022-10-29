@@ -1,5 +1,6 @@
 package Shape;
 
+import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
@@ -8,8 +9,9 @@ public class Brush extends Shape2D {
         super(vertices);
     }
 
-    public Brush(Vector<Vertex> vertices, int verticesNum) {
-        super(vertices, verticesNum);
+
+    public Brush(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
+        super(vertices, verticesNum, lineWidth, color);
     }
 
     @Override
@@ -24,6 +26,6 @@ public class Brush extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Brush(_vertices, _verticesNum);
+        return new Brush(_vertices, _verticesNum, _lineWidth, _color);
     }
 }

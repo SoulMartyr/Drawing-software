@@ -1,7 +1,7 @@
 package Shape;
 
+import java.awt.Color;
 import java.awt.geom.GeneralPath;
-import java.util.Arrays;
 import java.util.Vector;
 
 public class Rectangle extends Shape2D {
@@ -12,7 +12,9 @@ public class Rectangle extends Shape2D {
     public Rectangle(Vector<Vertex> vertices, int verticesNum) {
         super(vertices, verticesNum);
     }
-
+    public Rectangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
+        super(vertices, verticesNum, lineWidth, color);
+    }
     @Override
     public GeneralPath generatePath() {
         GeneralPath path = new GeneralPath();
@@ -35,7 +37,7 @@ public class Rectangle extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Rectangle(_vertices, _verticesNum);
+        return new Rectangle(_vertices, _verticesNum, _lineWidth, _color);
     }
 
 
