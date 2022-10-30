@@ -333,9 +333,6 @@ public class MainUI extends JFrame {
             switch (str) {
                 case "Brush", "Line", "Curve", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
                         "Circle", "Polygon", "Eraser" -> {
-                    for (int i = _vecIndex; i < _shape2DVec.size(); i++) {
-                        _shape2DVec.remove(_vecIndex);
-                    }
 
                     _func = Function.valueOf(e.getActionCommand());
                     _vertices = new Vector<>(_func.getVerticesNum());
@@ -388,6 +385,14 @@ public class MainUI extends JFrame {
         public void mousePressed(MouseEvent e) {
             super.mousePressed(e);
             try {
+                int count = _shape2DVec.size() - _vecIndex;
+                if (count > 0) {
+                    for (int i = 0; i < count; i++) {
+                        _shape2DVec.remove(_shape2DVec.size() - 1);
+                    }
+                    _shape2D.clear();
+                }
+
                 _shape2D.SetLineWidth(_lineWidth);
 
                 utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
