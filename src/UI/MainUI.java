@@ -4,7 +4,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
 
 import Shape.*;
@@ -17,9 +21,10 @@ public class MainUI extends JFrame {
     private JMenuBar _menubar;
     private JMenu _menuFile, _menuOperate, _menuView;
     private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuZoomIn, _menuZoomOut;
+    private Vector<JMenuItem> _menuItemVec;
 
     private JToolBar _toolBar;
-    private JButton _btnLine, _btnCurve, _btnTriangle, _btnRectangle, _btnRoundedRectangle,
+    private JButton _btnLine, _btnQuad, _btnTriangle, _btnRightTriangle, _btnRectangle, _btnRoundedRectangle,
             _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser, _colorViewer, _btnLineWidth;
     private Vector<JButton> _toolBtnVec;
 
@@ -36,6 +41,7 @@ public class MainUI extends JFrame {
     private Color _cvColor, _bgColor;
     private int _lineWidth;
     private JButton _preBtn;
+    private int _vecIndex;
 
     /**
      * 初始化窗口与控件
@@ -48,6 +54,7 @@ public class MainUI extends JFrame {
         InitCanvas();
         setVisible(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        InitMenuListener();
         InitBtnListener();
         InitCanvasListener();
     }
@@ -87,6 +94,14 @@ public class MainUI extends JFrame {
         _menuView.add(_menuZoomIn);
         _menuView.add(_menuZoomOut);
 
+        _menuItemVec = new Vector<>();
+        _menuItemVec.add(_menuOpen);
+        _menuItemVec.add(_menuSave);
+        _menuItemVec.add(_menuCancel);
+        _menuItemVec.add(_menuRedo);
+        _menuItemVec.add(_menuZoomIn);
+        _menuItemVec.add(_menuZoomOut);
+
         _menubar = new JMenuBar();
         _menubar.add(_menuFile);
         _menubar.add(_menuOperate);
@@ -97,7 +112,7 @@ public class MainUI extends JFrame {
 
 
     private void InitToolBar() {
-        String[] _toolBtnStr = {"Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
+        String[] _toolBtnStr = {"Brush", "Line", "Quad", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
                 "Circle", "Polygon", "Eraser", "LineWidth", "ColorChooser", "ColorViewer"};
 
         _toolBtnVec = new Vector<>();
@@ -106,10 +121,12 @@ public class MainUI extends JFrame {
         _toolBtnVec.add(_btnBrush);
         _btnLine = new JButton();
         _toolBtnVec.add(_btnLine);
-        _btnCurve = new JButton();
-        _toolBtnVec.add(_btnCurve);
+        _btnQuad = new JButton();
+        _toolBtnVec.add(_btnQuad);
         _btnTriangle = new JButton();
         _toolBtnVec.add(_btnTriangle);
+        _btnRightTriangle = new JButton();
+        _toolBtnVec.add(_btnRightTriangle);
         _btnRectangle = new JButton();
         _toolBtnVec.add(_btnRectangle);
         _btnRoundedRectangle = new JButton();
@@ -180,6 +197,7 @@ public class MainUI extends JFrame {
 
     }
 
+
     private void InitCanvas() {
         _canvasPanel = new JPanel();
         _canvasPanel.setLayout(new GridLayout());
@@ -188,7 +206,8 @@ public class MainUI extends JFrame {
             public void paint(Graphics g) {
                 g.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                 Graphics2D g2D = (Graphics2D) g;
-                for (Shape2D shape2D : _shape2DVec) {
+                for (int i = 0; i < _vecIndex; i++) {
+                    Shape2D shape2D = _shape2DVec.get(i);
                     PaintShape2D(g2D, shape2D);
                 }
             }
@@ -202,61 +221,23 @@ public class MainUI extends JFrame {
         _func = Function.Line;
         _preBtn = _btnLine;
 
-
+        _lineWidth = 4;
         _cvColor = Color.BLACK;
         _bgColor = Color.WHITE;
-        _lineWidth = 4;
+
+        _vecIndex = 0;
+
+    }
+
+    private void InitMenuListener() {
+        for (JMenuItem jMenuItem : _menuItemVec) {
+            jMenuItem.addActionListener(new MenuItemListener());
+        }
     }
 
     private void InitBtnListener() {
         for (JButton btn : _toolBtnVec) {
-            switch (btn.getText()) {
-                case "Brush", "Line", "Curve", "Triangle", "Rectangle", "RoundedRectangle",
-                        "Circle", "Polygon", "Eraser" -> {
-                    btn.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            _func = Function.valueOf(e.getActionCommand());
-                            _vertices = new Vector<>(_func.getVerticesNum());
-                            _shape2D = utils.ActionSwitch(_vertices, _func);
-
-                            JButton lastBtn = (JButton) e.getSource();
-                            lastBtn.setEnabled(false);
-                            _preBtn.setEnabled(true);
-
-                            _preBtn = lastBtn;
-                        }
-
-                    });
-                }
-                case "LineWidth" -> {
-                    btn.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            String strLineWidth = JOptionPane.showInputDialog(null, "LineWidth",
-                                    "Input LineWidth", JOptionPane.QUESTION_MESSAGE);
-                            if (strLineWidth != null){
-                                _lineWidth = Integer.parseInt(strLineWidth);
-                                _shape2D.SetLineWidth(_lineWidth);
-                            }
-
-                        }
-                    });
-                }
-                case "ColorChooser"->{
-                    btn.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            Color color=JColorChooser.showDialog(null,"Select a color",_cvColor);
-
-                            _cvColor = color;
-                            _colorViewer.setBackground(color);
-                            _shape2D.SetColor(_cvColor);
-                        }
-                    });
-                }
-            }
-
+            btn.addActionListener(new BtnListener());
         }
     }
 
@@ -267,63 +248,6 @@ public class MainUI extends JFrame {
         _canvas.addMouseMotionListener(new CanvasListener());
         _btnLine.doClick();
         _btnLine.setEnabled(false);
-        ;
-    }
-
-    private class CanvasListener extends MouseAdapter {
-        @Override
-        public void mousePressed(MouseEvent e) {
-            super.mousePressed(e);
-            if (_shape2D == null)
-                return;
-
-            _shape2D.SetLineWidth(_lineWidth);
-            if (_func == Function.Eraser)
-                _shape2D.SetColor(_bgColor);
-            else
-                _shape2D.SetColor(_cvColor);
-
-
-            utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
-
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            super.mouseReleased(e);
-            if (_shape2D == null)
-                return;
-
-            utils.ReleasedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
-
-        }
-
-        @Override
-        public void mouseDragged(MouseEvent e) {
-            super.mouseDragged(e);
-            if (_shape2D == null)
-                return;
-            do {
-                do {
-                    Graphics2D graphics = (Graphics2D) _strategy.getDrawGraphics();
-
-                    graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
-                    for (Shape2D shape2D : _shape2DVec) {
-                        PaintShape2D(graphics, shape2D);
-                    }
-
-                    utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
-                    PaintShape2D(graphics, _shape2D);
-
-                    graphics.dispose();
-
-                } while (_strategy.contentsRestored());
-                _strategy.show();
-
-            } while (_strategy.contentsLost());
-        }
-
     }
 
     private void PaintShape2D(Graphics2D graphics2D, Shape2D shape2D) {
@@ -332,4 +256,195 @@ public class MainUI extends JFrame {
         graphics2D.setStroke(new BasicStroke(shape2D.GetLineWidth()));
         graphics2D.draw(shape2D.generatePath());
     }
+
+    private class MenuItemListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String str = e.getActionCommand();
+            switch (str) {
+                case "Open" -> {
+                    JFileChooser fileChooser = new JFileChooser("D:\\");
+                    fileChooser.setFileFilter(new FileNameExtensionFilter("Png Img (*.png)", "png"));
+                    int result = fileChooser.showOpenDialog(MainUI.this);
+                    if (result == JFileChooser.OPEN_DIALOG) {
+                        File file = fileChooser.getSelectedFile();
+                        try {
+                            BufferedImage image = ImageIO.read(file);//获取图片
+                            Graphics g = _canvas.getGraphics();
+                            g.drawImage(image, 0, 0, _canvas.getWidth(), _canvas.getHeight(), MainUI.this);
+                        } catch (IOException ioe) {
+                            ioe.printStackTrace();
+                        }
+                    }
+
+                }
+                case "Save" -> {
+                    BufferedImage img = new BufferedImage(
+                            _canvas.getWidth(), _canvas.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    Graphics2D g2D = img.createGraphics();
+                    g2D.setColor(_bgColor);
+                    g2D.fillRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
+                    for (Shape2D shape2D : _shape2DVec) {
+                        PaintShape2D(g2D, shape2D);
+                    }
+
+                    JFileChooser fileChooser = new JFileChooser("D:\\");
+                    fileChooser.setFileFilter(new FileNameExtensionFilter("Png Img (*.png)", "png"));
+                    int result = fileChooser.showSaveDialog(MainUI.this);
+                    if (result == JFileChooser.SAVE_DIALOG) {
+                        File file = fileChooser.getSelectedFile();
+                        if (!file.getAbsolutePath().endsWith(".png"))
+                            file = new File(file.getAbsolutePath() + ".png");
+
+                        try {
+                            ImageIO.write(img, "png", file);
+                        } catch (IOException ioe) {
+                            ioe.printStackTrace();
+                        }
+                    }
+                }
+                case "Cancel" -> {
+                    try {
+                        _vecIndex -= 1;
+                        _canvas.paint(_canvas.getGraphics());
+                    } catch (IndexOutOfBoundsException iobe) {
+                        _vecIndex += 1;
+                        iobe.printStackTrace();
+                    }
+                }
+                case "Redo" -> {
+                    try {
+                        _vecIndex += 1;
+                        _canvas.paint(_canvas.getGraphics());
+                    } catch (IndexOutOfBoundsException iobe) {
+                        _vecIndex -= 1;
+                        iobe.printStackTrace();
+                    }
+                }
+
+            }
+        }
+    }
+
+    private class BtnListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String str = e.getActionCommand();
+            switch (str) {
+                case "Brush", "Line", "Curve", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
+                        "Circle", "Polygon", "Eraser" -> {
+                    for (int i = _vecIndex; i < _shape2DVec.size(); i++) {
+                        _shape2DVec.remove(_vecIndex);
+                    }
+
+                    _func = Function.valueOf(e.getActionCommand());
+                    _vertices = new Vector<>(_func.getVerticesNum());
+                    _shape2D = utils.ActionSwitch(_vertices, _func);
+
+                    JButton lastBtn = (JButton) e.getSource();
+                    lastBtn.setEnabled(false);
+                    _preBtn.setEnabled(true);
+
+                    _preBtn = lastBtn;
+                }
+                case "LineWidth" -> {
+                    String strLineWidth = JOptionPane.showInputDialog(MainUI.this, "LineWidth",
+                            "Input LineWidth", JOptionPane.QUESTION_MESSAGE);
+                    try {
+                        _lineWidth = Integer.parseInt(strLineWidth);
+                        _shape2D.SetLineWidth(_lineWidth);
+                    } catch (NullPointerException | NumberFormatException ne) {
+                        ne.printStackTrace();
+                    }
+                }
+                case "ColorChooser" -> {
+                    Color color = JColorChooser.showDialog(null, "Select a color", _cvColor);
+
+                    _cvColor = color;
+                    _colorViewer.setBackground(color);
+                    _shape2D.SetColor(_cvColor);
+                }
+            }
+        }
+    }
+
+    private class CanvasListener extends MouseAdapter {
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == 3 && _func == Function.Polygon) {
+                String strVerticesNum = JOptionPane.showInputDialog(MainUI.this, "Vertices Num(default:5)",
+                        "Input VerticesNum", JOptionPane.QUESTION_MESSAGE);
+                try {
+                    Function.Polygon.setVerticesNum(Integer.parseInt(strVerticesNum));
+                    _shape2D = utils.ActionSwitch(_vertices, _func);
+                } catch (NullPointerException | NumberFormatException ne) {
+                    ne.printStackTrace();
+                }
+            }
+
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
+            try {
+                _shape2D.SetLineWidth(_lineWidth);
+
+                utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
+
+                if (_func == Function.Eraser)
+                    _shape2D.SetColor(_bgColor);
+                else
+                    _shape2D.SetColor(_cvColor);
+
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+            }
+        }
+
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            super.mouseReleased(e);
+            try {
+                utils.ReleasedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
+                _vecIndex = _shape2DVec.size();
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+            }
+
+
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            super.mouseDragged(e);
+            try {
+                do {
+                    do {
+                        Graphics2D graphics = (Graphics2D) _strategy.getDrawGraphics();
+
+                        graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
+                        for (Shape2D shape2D : _shape2DVec) {
+                            PaintShape2D(graphics, shape2D);
+                        }
+
+                        utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
+                        PaintShape2D(graphics, _shape2D);
+
+                        graphics.dispose();
+
+                    } while (_strategy.contentsRestored());
+                    _strategy.show();
+
+                } while (_strategy.contentsLost());
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
+            }
+        }
+
+
+    }
+
+
 }

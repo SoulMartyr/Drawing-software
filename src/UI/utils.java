@@ -13,6 +13,9 @@ public class utils {
             case Triangle -> {
                 return new Triangle(vertices);
             }
+            case RightTriangle -> {
+                return new RightTriangle(vertices);
+            }
             case Rectangle -> {
                 return new Rectangle(vertices);
             }
@@ -23,10 +26,10 @@ public class utils {
                 return new RoundedRectangle(vertices);
             }
             case Curve -> {
-                return new QuadCurve(vertices);
+                return new Quad(vertices);
             }
             case Polygon -> {
-                return new Polygon(vertices);
+                return new Polygon(vertices, Function.Polygon.getVerticesNum());
             }
             case Brush -> {
                 return new Brush(vertices);
@@ -44,7 +47,7 @@ public class utils {
                 shape2D.AddVertex(x, y);
                 shape2D.AddVertex(x, y);
             }
-            case Triangle, Curve -> {
+            case Triangle, RightTriangle, Curve -> {
                 if (shape2D.GetVerticesNum() == 0) {
                     shape2D.AddVertex(x, y);
                 } else {
@@ -79,7 +82,7 @@ public class utils {
                 }
                 shape2D.AddVertex(x, y);
             }
-            case Brush,Eraser -> {
+            case Brush, Eraser -> {
                 shape2D.AddVertex(x, y);
             }
         }
@@ -92,7 +95,7 @@ public class utils {
                 shape2DVec.add(shape2D.cloneShape2D());
                 shape2D.clear();
             }
-            case Triangle, Curve -> {
+            case Triangle, RightTriangle, Curve -> {
                 if (shape2D.GetVerticesNum() == 2) {
                     shape2D.ChangeVertex(1, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
@@ -136,7 +139,7 @@ public class utils {
                     shape2D.clear();
                 }
             }
-            case Brush,Eraser -> {
+            case Brush, Eraser -> {
                 shape2D.ChangeVertex(shape2D.GetVerticesNum() - 1, x, y);
                 shape2DVec.add(shape2D.cloneShape2D());
                 shape2D.clear();
@@ -151,7 +154,7 @@ public class utils {
             case Line, Circle -> {
                 shape2D.ChangeVertex(1, x, y);
             }
-            case Triangle, Curve -> {
+            case Triangle, RightTriangle, Curve -> {
                 if (shape2D.GetVerticesNum() == 2)
                     shape2D.ChangeVertex(1, x, y);
                 if (shape2D.GetVerticesNum() == 3)
@@ -174,7 +177,7 @@ public class utils {
             case Polygon -> {
                 shape2D.ChangeVertex(shape2D.GetVerticesNum() - 1, x, y);
             }
-            case Brush,Eraser -> {
+            case Brush, Eraser -> {
                 shape2D.AddVertex(x, y);
             }
         }

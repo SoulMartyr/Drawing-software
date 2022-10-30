@@ -4,12 +4,12 @@ import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
-public class QuadCurve extends Shape2D{
-    public QuadCurve(Vector<Vertex> vertices) {
+public class Quad extends Shape2D{
+    public Quad(Vector<Vertex> vertices) {
         super(vertices);
     }
 
-    public QuadCurve(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
+    public Quad(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
         super(vertices, verticesNum, lineWidth, color);
     }
 
@@ -28,6 +28,6 @@ public class QuadCurve extends Shape2D{
     }
     @Override
     public Shape2D cloneShape2D() {
-        return new QuadCurve(_vertices, _verticesNum, _lineWidth, _color);
+        return new Quad(_vertices, _verticesNum, _lineWidth, _color);
     }
 }
