@@ -11,9 +11,10 @@ public class RoundedRectangle extends Rectangle {
         super(vertices);
     }
 
-    public RoundedRectangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public RoundedRectangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor, boolean isFill, Color fillColor) {
+        super(vertices, verticesNum, lineWidth, drawColor, isFill, fillColor);
     }
+
     @Override
     public GeneralPath generatePath() {
         GeneralPath path = new GeneralPath();
@@ -44,7 +45,7 @@ public class RoundedRectangle extends Rectangle {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new RoundedRectangle(_vertices, _verticesNum, _lineWidth, _color);
+        return new RoundedRectangle(_vertices, _verticesNum, _lineWidth, _drawColor, _isFill, _fillColor);
     }
 
 
@@ -59,7 +60,7 @@ public class RoundedRectangle extends Rectangle {
             }
         }
         int nextIdx = (LUIdx + 1) % 4;
-        int det = (_vertices.get(LUIdx).getX()-CenterX) * (_vertices.get(nextIdx).getY()-CenterY) - (_vertices.get(nextIdx).getX() -CenterX)* (_vertices.get(LUIdx).getY()-CenterY);
+        int det = (_vertices.get(LUIdx).getX() - CenterX) * (_vertices.get(nextIdx).getY() - CenterY) - (_vertices.get(nextIdx).getX() - CenterX) * (_vertices.get(LUIdx).getY() - CenterY);
         Vertex[] vertices = new Vertex[5];
         if (det < 0) {
             for (int i = 0; i < 4; i++) {

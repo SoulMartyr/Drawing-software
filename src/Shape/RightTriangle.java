@@ -9,8 +9,8 @@ public class RightTriangle extends Shape2D {
         super(vertices);
     }
 
-    public RightTriangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public RightTriangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor, boolean isFill, Color fillColor) {
+        super(vertices, verticesNum, lineWidth, drawColor, isFill, fillColor);
     }
 
     @Override
@@ -31,7 +31,7 @@ public class RightTriangle extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new RightTriangle(_vertices, _verticesNum, _lineWidth, _color);
+        return new RightTriangle(_vertices, _verticesNum, _lineWidth, _drawColor, _isFill, _fillColor);
     }
 
     private Vertex calThirdVerTex() {

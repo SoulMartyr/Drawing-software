@@ -6,11 +6,14 @@ import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
 public class Circle extends Shape2D {
-    public Circle(Vector<Vertex> vertices) {super(vertices); }
-
-    public Circle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public Circle(Vector<Vertex> vertices) {
+        super(vertices);
     }
+
+    public Circle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor, boolean isFill, Color fillColor) {
+        super(vertices, verticesNum, lineWidth, drawColor, isFill, fillColor);
+    }
+
     @Override
     public GeneralPath generatePath() {
         Ellipse2D circle = new Ellipse2D.Double();
@@ -26,7 +29,7 @@ public class Circle extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Circle(_vertices, _verticesNum, _lineWidth, _color);
+        return new Circle(_vertices, _verticesNum, _lineWidth, _drawColor, _isFill, _fillColor);
     }
 
 

@@ -9,8 +9,8 @@ public class Triangle extends Shape2D {
         super(vertices);
     }
 
-    public Triangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public Triangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor,boolean isFill,Color fillColor) {
+        super(vertices, verticesNum, lineWidth, drawColor,isFill,fillColor);
     }
 
     @Override
@@ -31,6 +31,6 @@ public class Triangle extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Triangle(_vertices, _verticesNum, _lineWidth, _color);
+        return new Triangle(_vertices, _verticesNum, _lineWidth, _drawColor,_isFill,_fillColor);
     }
 }

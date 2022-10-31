@@ -25,7 +25,7 @@ public class utils {
             case RoundedRectangle -> {
                 return new RoundedRectangle(vertices);
             }
-            case Curve -> {
+            case Quad -> {
                 return new Quad(vertices);
             }
             case Polygon -> {
@@ -47,7 +47,7 @@ public class utils {
                 shape2D.AddVertex(x, y);
                 shape2D.AddVertex(x, y);
             }
-            case Triangle, RightTriangle, Curve -> {
+            case Triangle, RightTriangle, Quad -> {
                 if (shape2D.GetVerticesNum() == 0) {
                     shape2D.AddVertex(x, y);
                 } else {
@@ -95,7 +95,7 @@ public class utils {
                 shape2DVec.add(shape2D.cloneShape2D());
                 shape2D.clear();
             }
-            case Triangle, RightTriangle, Curve -> {
+            case Triangle, RightTriangle, Quad -> {
                 if (shape2D.GetVerticesNum() == 2) {
                     shape2D.ChangeVertex(1, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
@@ -154,7 +154,7 @@ public class utils {
             case Line, Circle -> {
                 shape2D.ChangeVertex(1, x, y);
             }
-            case Triangle, RightTriangle, Curve -> {
+            case Triangle, RightTriangle, Quad -> {
                 if (shape2D.GetVerticesNum() == 2)
                     shape2D.ChangeVertex(1, x, y);
                 if (shape2D.GetVerticesNum() == 3)

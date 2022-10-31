@@ -14,8 +14,8 @@ public class Polygon extends Shape2D {
         _polygonNum = polygonNum;
     }
 
-    public Polygon(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color, int polygonNum) {
-        super(vertices, verticesNum, lineWidth, color);
+    public Polygon(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor,boolean isFill,Color fillColor,int polygonNum) {
+        super(vertices, verticesNum, lineWidth, drawColor, isFill, fillColor);
         _polygonNum = polygonNum;
     }
 
@@ -33,6 +33,6 @@ public class Polygon extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Polygon(_vertices, _verticesNum, _lineWidth, _color, _polygonNum);
+        return new Polygon(_vertices, _verticesNum, _lineWidth, _drawColor,_isFill,_fillColor, _polygonNum);
     }
 }

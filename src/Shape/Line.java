@@ -13,8 +13,8 @@ public class Line extends Shape2D {
         super(vertices, verticesNum);
     }
 
-    public Line(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public Line(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor) {
+        super(vertices, verticesNum, lineWidth, drawColor);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class Line extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Line(_vertices, _verticesNum,_lineWidth,_color);
+        return new Line(_vertices, _verticesNum,_lineWidth,_drawColor);
     }
 
 

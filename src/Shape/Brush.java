@@ -10,8 +10,8 @@ public class Brush extends Shape2D {
     }
 
 
-    public Brush(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public Brush(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor) {
+        super(vertices, verticesNum, lineWidth, drawColor);
     }
 
     @Override
@@ -26,6 +26,6 @@ public class Brush extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Brush(_vertices, _verticesNum, _lineWidth, _color);
+        return new Brush(_vertices, _verticesNum, _lineWidth, _drawColor);
     }
 }

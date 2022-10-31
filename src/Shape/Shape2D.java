@@ -8,7 +8,8 @@ public class Shape2D {
     protected Vector<Vertex> _vertices;
     protected int _verticesNum;
     protected int _lineWidth;
-    protected Color _color;
+    protected Color _drawColor, _fillColor;
+    protected boolean _isFill;
 
     public Shape2D() {
         this(null, 0);
@@ -19,14 +20,20 @@ public class Shape2D {
     }
 
     public Shape2D(Vector<Vertex> vertices, int verticesNum) {
-        this(vertices, verticesNum, 4, Color.BLACK);
+        this(vertices, verticesNum, 4, Color.BLACK, false, Color.WHITE);
     }
 
-    public Shape2D(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
+    public Shape2D(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor) {
+        this(vertices, verticesNum, lineWidth, drawColor, false, Color.WHITE);
+    }
+
+    public Shape2D(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor, boolean isFill, Color fillColor) {
         _vertices = new Vector<>(vertices);
         _verticesNum = verticesNum;
         _lineWidth = lineWidth;
-        _color = color;
+        _drawColor = drawColor;
+        _isFill = isFill;
+        _fillColor = fillColor;
     }
 
     public GeneralPath generatePath() {
@@ -54,13 +61,30 @@ public class Shape2D {
         return _lineWidth;
     }
 
-    public void SetColor(Color color) {
-        _color = color;
+    public void SetDrawColor(Color color) {
+        _drawColor = color;
     }
 
-    public Color GetColor() {
-        return _color;
+    public Color GetDrawColor() {
+        return _drawColor;
     }
+
+    public void SetFill(boolean isFill) {
+        _isFill = isFill;
+    }
+
+    public boolean isFill() {
+        return _isFill;
+    }
+
+    public void SetFillColor(Color color) {
+        _fillColor = color;
+    }
+
+    public Color GetFillColor() {
+        return _fillColor;
+    }
+
 
     public Shape2D cloneShape2D() {
         return new Shape2D(_vertices, _verticesNum);

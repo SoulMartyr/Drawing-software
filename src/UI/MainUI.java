@@ -2,6 +2,7 @@ package UI;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.GeneralPath;
 import java.awt.image.BufferStrategy;
 
 import javax.imageio.ImageIO;
@@ -19,15 +20,15 @@ import Shape.*;
  */
 public class MainUI extends JFrame {
     private JMenuBar _menubar;
-    private JMenu _menuFile, _menuOperate, _menuView;
-    private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuZoomIn, _menuZoomOut;
+    private JMenu _menuFile, _menuOperate;
+    private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuBgColor;
     private Vector<JMenuItem> _menuItemVec;
 
     private JToolBar _toolBar;
     private JButton _btnLine, _btnQuad, _btnTriangle, _btnRightTriangle, _btnRectangle, _btnRoundedRectangle,
-            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnColorChooser, _colorViewer, _btnLineWidth;
+            _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnDrawColorChooser, _drawColorViewer, _btnFillColorChooser, _btnLineWidth, _fillColorViewer;
+    private JCheckBox _btnFill;
     private Vector<JButton> _toolBtnVec;
-
 
     private Container _container;
     private JPanel _canvasPanel;
@@ -38,8 +39,9 @@ public class MainUI extends JFrame {
     private BufferStrategy _strategy;
     private Shape2D _shape2D;
     private Vector<Shape2D> _shape2DVec;
-    private Color _cvColor, _bgColor;
     private int _lineWidth;
+    private boolean _isFill;
+    private Color _cvColor, _bgColor, _fillColor;
     private JButton _preBtn;
     private int _vecIndex;
 
@@ -78,83 +80,97 @@ public class MainUI extends JFrame {
     private void InitMenuBar() {
         _menuFile = new JMenu("File");
         _menuOperate = new JMenu("Operate");
-        _menuView = new JMenu("View");
-
         _menuOpen = new JMenuItem("Open");
         _menuSave = new JMenuItem("Save");
         _menuCancel = new JMenuItem("Cancel");
         _menuRedo = new JMenuItem("Redo");
-        _menuZoomIn = new JMenuItem("ZoomIn");
-        _menuZoomOut = new JMenuItem("ZoomOut");
+        _menuBgColor = new JMenuItem("Background Color");
 
         _menuFile.add(_menuOpen);
         _menuFile.add(_menuSave);
         _menuOperate.add(_menuCancel);
         _menuOperate.add(_menuRedo);
-        _menuView.add(_menuZoomIn);
-        _menuView.add(_menuZoomOut);
+        _menuOperate.add(_menuBgColor);
 
         _menuItemVec = new Vector<>();
         _menuItemVec.add(_menuOpen);
         _menuItemVec.add(_menuSave);
         _menuItemVec.add(_menuCancel);
         _menuItemVec.add(_menuRedo);
-        _menuItemVec.add(_menuZoomIn);
-        _menuItemVec.add(_menuZoomOut);
+        _menuItemVec.add(_menuBgColor);
 
         _menubar = new JMenuBar();
         _menubar.add(_menuFile);
         _menubar.add(_menuOperate);
-        _menubar.add(_menuView);
 
         setJMenuBar(_menubar);
     }
 
-
     private void InitToolBar() {
         String[] _toolBtnStr = {"Brush", "Line", "Quad", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
-                "Circle", "Polygon", "Eraser", "LineWidth", "ColorChooser", "ColorViewer"};
+                "Circle", "Polygon", "Eraser", "LineWidth", "DrawColorChooser","DrawColorViewer","FillColorChooser","FillColorViewer"};
 
         _toolBtnVec = new Vector<>();
         //绘图类
         _btnBrush = new JButton();
         _toolBtnVec.add(_btnBrush);
+        _btnBrush.setToolTipText("Draw free.");
         _btnLine = new JButton();
         _toolBtnVec.add(_btnLine);
+        _btnLine.setToolTipText("Draw Line.");
         _btnQuad = new JButton();
         _toolBtnVec.add(_btnQuad);
+        _btnQuad.setToolTipText("Draw Quadratic Curve.");
         _btnTriangle = new JButton();
         _toolBtnVec.add(_btnTriangle);
+        _btnTriangle.setToolTipText("Draw Triangle.");
         _btnRightTriangle = new JButton();
         _toolBtnVec.add(_btnRightTriangle);
+        _btnRightTriangle.setToolTipText("Draw RightTriangle.");
         _btnRectangle = new JButton();
         _toolBtnVec.add(_btnRectangle);
+        _btnRectangle.setToolTipText("Draw Rectangle.");
         _btnRoundedRectangle = new JButton();
         _toolBtnVec.add(_btnRoundedRectangle);
+        _btnRoundedRectangle.setToolTipText("Draw RoundedRectangle.");
         _btnCircle = new JButton();
         _toolBtnVec.add(_btnCircle);
+        _btnCircle.setToolTipText("Draw Circle.");
         _btnPolygon = new JButton();
         _toolBtnVec.add(_btnPolygon);
+        _btnCircle.setToolTipText("Draw Polygon.Right click to set vertices number.");
         //操作类
         _btnEraser = new JButton();
         _toolBtnVec.add(_btnEraser);
+        _btnEraser.setToolTipText("Eraser.");
         _btnLineWidth = new JButton();
         _toolBtnVec.add(_btnLineWidth);
+        _btnLineWidth.setToolTipText("Set Line Width.");
         //颜色类
-        _btnColorChooser = new JButton();
-        _toolBtnVec.add(_btnColorChooser);
-        _colorViewer = new JButton("");
-        _toolBtnVec.add(_colorViewer);
+        _btnDrawColorChooser = new JButton();
+        _toolBtnVec.add(_btnDrawColorChooser);
+        _btnDrawColorChooser.setToolTipText("Set color of draw.");
+        _drawColorViewer = new JButton();
+        _toolBtnVec.add(_drawColorViewer);
+        _btnFillColorChooser = new JButton();
+        _toolBtnVec.add(_btnFillColorChooser);
+        _fillColorViewer = new JButton();
+        _toolBtnVec.add(_fillColorViewer);
+        _btnFillColorChooser.setToolTipText("Set color of fill.");
+
+        _btnFill = new JCheckBox("Fill");
+        _btnFill.setSize(32,32);
+        _btnFill.setFont(new Font("宋体", 0, 16));
 
         for (int i = 0; i < _toolBtnVec.size(); i++) {
             JButton btn = _toolBtnVec.get(i);
             String functionName = Function.values()[i].toString();
-            if (functionName.equals("ColorViewer")) {
+            if (functionName.equals("DrawColorViewer") || functionName.equals("FillColorViewer")) {
                 btn.setText("     ");
                 btn.setFont(new Font("宋体", 1, 30));
                 btn.setOpaque(true);
                 btn.setEnabled(false);
-                btn.setBackground(Color.black);
+                btn.setBackground(Color.BLACK);
             } else {
                 btn.setText(functionName);
                 btn.setFont(new Font("宋体", 1, 0));
@@ -166,8 +182,10 @@ public class MainUI extends JFrame {
 
         _toolBar = new JToolBar("ToolBar");
 
-        for (JButton btn : _toolBtnVec) {
-            switch (btn.getText()) {
+        for (int i = 0; i < _toolBtnVec.size(); i++) {
+            JButton btn = _toolBtnVec.get(i);
+            String functionName = Function.values()[i].toString();
+            switch (functionName) {
                 case "Brush" -> {
                     _toolBar.add(new JLabel("Draw"));
                     _toolBar.addSeparator();
@@ -177,14 +195,16 @@ public class MainUI extends JFrame {
                     _toolBar.add(new JLabel("Tool"));
                     _toolBar.addSeparator();
                 }
-                case "ColorChooser" -> {
+                case "DrawColorChooser" -> {
                     _toolBar.addSeparator();
-                    _toolBar.add(new JLabel("Color Chooser"));
+                    _toolBar.add(new JLabel("Current Draw Color"));
                     _toolBar.addSeparator();
                 }
-                case "     " -> {
+                case "FillColorChooser" ->{
                     _toolBar.addSeparator();
-                    _toolBar.add(new JLabel("Current Color"));
+                    _toolBar.add(_btnFill);
+                    _toolBar.addSeparator();
+                    _toolBar.add(new JLabel("Current Fill Color"));
                     _toolBar.addSeparator();
                 }
             }
@@ -196,7 +216,6 @@ public class MainUI extends JFrame {
         _container.add(_toolBar, BorderLayout.NORTH);
 
     }
-
 
     private void InitCanvas() {
         _canvasPanel = new JPanel();
@@ -224,8 +243,11 @@ public class MainUI extends JFrame {
         _lineWidth = 4;
         _cvColor = Color.BLACK;
         _bgColor = Color.WHITE;
+        _isFill = false;
+        _fillColor = Color.BLACK;
 
         _vecIndex = 0;
+
 
     }
 
@@ -239,6 +261,12 @@ public class MainUI extends JFrame {
         for (JButton btn : _toolBtnVec) {
             btn.addActionListener(new BtnListener());
         }
+        _btnFill.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                _isFill = !_isFill;
+            }
+        });
     }
 
     private void InitCanvasListener() {
@@ -252,9 +280,14 @@ public class MainUI extends JFrame {
 
     private void PaintShape2D(Graphics2D graphics2D, Shape2D shape2D) {
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics2D.setColor(shape2D.GetColor());
+        graphics2D.setColor(shape2D.GetDrawColor());
         graphics2D.setStroke(new BasicStroke(shape2D.GetLineWidth()));
-        graphics2D.draw(shape2D.generatePath());
+        GeneralPath path = shape2D.generatePath();
+        graphics2D.draw(path);
+        if(shape2D.isFill()){
+            graphics2D.setColor(shape2D.GetFillColor());
+            graphics2D.fill(path);
+        }
     }
 
     private class MenuItemListener implements ActionListener {
@@ -321,6 +354,12 @@ public class MainUI extends JFrame {
                         iobe.printStackTrace();
                     }
                 }
+                case"Background Color" ->{
+                    Color color = JColorChooser.showDialog(null, "Select a color", _cvColor);
+
+                    _bgColor = color;
+                    _canvas.setBackground(color);
+                }
 
             }
         }
@@ -331,7 +370,7 @@ public class MainUI extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String str = e.getActionCommand();
             switch (str) {
-                case "Brush", "Line", "Curve", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
+                case "Brush", "Line", "Quad", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
                         "Circle", "Polygon", "Eraser" -> {
 
                     _func = Function.valueOf(e.getActionCommand());
@@ -354,12 +393,18 @@ public class MainUI extends JFrame {
                         ne.printStackTrace();
                     }
                 }
-                case "ColorChooser" -> {
+                case "DrawColorChooser" -> {
                     Color color = JColorChooser.showDialog(null, "Select a color", _cvColor);
 
                     _cvColor = color;
-                    _colorViewer.setBackground(color);
-                    _shape2D.SetColor(_cvColor);
+                    _drawColorViewer.setBackground(color);
+                    _shape2D.SetDrawColor(_cvColor);
+                }
+                case "FillColorChooser" -> {
+                    Color color = JColorChooser.showDialog(null, "Select a color", _cvColor);
+
+                    _fillColor = color;
+                    _fillColorViewer.setBackground(color);
                 }
             }
         }
@@ -383,6 +428,7 @@ public class MainUI extends JFrame {
 
         @Override
         public void mousePressed(MouseEvent e) {
+            if(e.getButton() != 1) return;
             super.mousePressed(e);
             try {
                 int count = _shape2DVec.size() - _vecIndex;
@@ -394,13 +440,15 @@ public class MainUI extends JFrame {
                 }
 
                 _shape2D.SetLineWidth(_lineWidth);
+                _shape2D.SetFill(_isFill);
+                _shape2D.SetFillColor(_fillColor);
 
                 utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
 
                 if (_func == Function.Eraser)
-                    _shape2D.SetColor(_bgColor);
+                    _shape2D.SetDrawColor(_bgColor);
                 else
-                    _shape2D.SetColor(_cvColor);
+                    _shape2D.SetDrawColor(_cvColor);
 
             } catch (NullPointerException npe) {
                 npe.printStackTrace();
@@ -410,6 +458,7 @@ public class MainUI extends JFrame {
 
         @Override
         public void mouseReleased(MouseEvent e) {
+            if(e.getButton() != 1) return;
             super.mouseReleased(e);
             try {
                 utils.ReleasedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
@@ -417,8 +466,6 @@ public class MainUI extends JFrame {
             } catch (NullPointerException npe) {
                 npe.printStackTrace();
             }
-
-
         }
 
         @Override
@@ -447,8 +494,6 @@ public class MainUI extends JFrame {
                 npe.printStackTrace();
             }
         }
-
-
     }
 
 

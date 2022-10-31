@@ -12,8 +12,8 @@ public class Rectangle extends Shape2D {
     public Rectangle(Vector<Vertex> vertices, int verticesNum) {
         super(vertices, verticesNum);
     }
-    public Rectangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color color) {
-        super(vertices, verticesNum, lineWidth, color);
+    public Rectangle(Vector<Vertex> vertices, int verticesNum, int lineWidth, Color drawColor,boolean isFill,Color fillColor) {
+        super(vertices, verticesNum, lineWidth, drawColor, isFill, fillColor);
     }
     @Override
     public GeneralPath generatePath() {
@@ -37,7 +37,7 @@ public class Rectangle extends Shape2D {
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Rectangle(_vertices, _verticesNum, _lineWidth, _color);
+        return new Rectangle(_vertices, _verticesNum, _lineWidth, _drawColor,_isFill,_fillColor);
     }
 
 

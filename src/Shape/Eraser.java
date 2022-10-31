@@ -15,6 +15,6 @@ public class Eraser extends Brush{
 
     @Override
     public Shape2D cloneShape2D() {
-        return new Eraser(_vertices, _verticesNum, _lineWidth, _color);
+        return new Eraser(_vertices, _verticesNum, _lineWidth, _drawColor);
     }
 }
