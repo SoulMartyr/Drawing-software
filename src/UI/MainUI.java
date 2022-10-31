@@ -174,7 +174,7 @@ public class MainUI extends JFrame {
             } else {
                 btn.setText(functionName);
                 btn.setFont(new Font("宋体", 1, 0));
-                btn.setIcon(new ImageIcon("src/icon/" + _toolBtnStr[i] + ".png"));
+                btn.setIcon(new ImageIcon(MainUI.class.getResource("/Icon/" + _toolBtnStr[i] + ".png")));
             }
             btn.setFocusPainted(false);
         }
@@ -299,7 +299,7 @@ public class MainUI extends JFrame {
                     JFileChooser fileChooser = new JFileChooser("D:\\");
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Png Img (*.png)", "png"));
                     int result = fileChooser.showOpenDialog(MainUI.this);
-                    if (result == JFileChooser.OPEN_DIALOG) {
+                    if (result == JFileChooser.APPROVE_OPTION) {
                         File file = fileChooser.getSelectedFile();
                         try {
                             BufferedImage image = ImageIO.read(file);//获取图片
@@ -324,11 +324,10 @@ public class MainUI extends JFrame {
                     JFileChooser fileChooser = new JFileChooser("D:\\");
                     fileChooser.setFileFilter(new FileNameExtensionFilter("Png Img (*.png)", "png"));
                     int result = fileChooser.showSaveDialog(MainUI.this);
-                    if (result == JFileChooser.SAVE_DIALOG) {
+                    if (result == JFileChooser.APPROVE_OPTION) {
                         File file = fileChooser.getSelectedFile();
                         if (!file.getAbsolutePath().endsWith(".png"))
                             file = new File(file.getAbsolutePath() + ".png");
-
                         try {
                             ImageIO.write(img, "png", file);
                         } catch (IOException ioe) {
@@ -355,7 +354,7 @@ public class MainUI extends JFrame {
                     }
                 }
                 case"Background Color" ->{
-                    Color color = JColorChooser.showDialog(null, "Select a color", _cvColor);
+                    Color color = JColorChooser.showDialog(MainUI.this, "Select a color", _cvColor);
 
                     _bgColor = color;
                     _canvas.setBackground(color);
