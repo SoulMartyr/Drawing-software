@@ -28,6 +28,11 @@ public class Line extends Shape2D {
     }
 
     @Override
+    public boolean isFill(){
+        return false;
+    }
+
+    @Override
     public Shape2D cloneShape2D() {
         return new Line(_vertices, _verticesNum,_lineWidth,_drawColor);
     }

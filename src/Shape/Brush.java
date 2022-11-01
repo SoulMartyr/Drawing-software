@@ -25,6 +25,11 @@ public class Brush extends Shape2D {
     }
 
     @Override
+    public boolean isFill(){
+        return false;
+    }
+
+    @Override
     public Shape2D cloneShape2D() {
         return new Brush(_vertices, _verticesNum, _lineWidth, _drawColor);
     }

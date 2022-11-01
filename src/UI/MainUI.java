@@ -24,7 +24,7 @@ import Shape.*;
 public class MainUI extends JFrame {
     private JMenuBar _menubar;
     private JMenu _menuFile, _menuOperate;
-    private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuBgColor;
+    private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuBgColor,_menuClear;
     private Vector<JMenuItem> _menuItemVec;
 
     private JToolBar _toolBar;
@@ -90,12 +90,14 @@ public class MainUI extends JFrame {
         _menuCancel = new JMenuItem("Cancel");
         _menuRedo = new JMenuItem("Redo");
         _menuBgColor = new JMenuItem("Background Color");
+        _menuClear = new JMenuItem("All Clear");
 
         _menuFile.add(_menuOpen);
         _menuFile.add(_menuSave);
         _menuOperate.add(_menuCancel);
         _menuOperate.add(_menuRedo);
         _menuOperate.add(_menuBgColor);
+        _menuOperate.add(_menuClear);
 
         _menuItemVec = new Vector<>();
         _menuItemVec.add(_menuOpen);
@@ -103,6 +105,7 @@ public class MainUI extends JFrame {
         _menuItemVec.add(_menuCancel);
         _menuItemVec.add(_menuRedo);
         _menuItemVec.add(_menuBgColor);
+        _menuItemVec.add(_menuClear);
 
         _menubar = new JMenuBar();
         _menubar.add(_menuFile);
@@ -365,6 +368,13 @@ public class MainUI extends JFrame {
 
                     _bgColor = color;
                     _canvas.setBackground(color);
+                }
+                case"All Clear" ->{
+                    Graphics g =_canvas.getGraphics();
+                    g.setColor(_bgColor);
+                    g.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
+                    _shape2DVec.clear();
+                    _vecIndex = 0;
                 }
 
             }

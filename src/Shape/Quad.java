@@ -26,6 +26,12 @@ public class Quad extends Shape2D{
         }
         return path;
     }
+
+    @Override
+    public boolean isFill(){
+        return false;
+    }
+
     @Override
     public Shape2D cloneShape2D() {
         return new Quad(_vertices, _verticesNum, _lineWidth, _drawColor,_isFill,_fillColor);
