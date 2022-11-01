@@ -4,6 +4,12 @@ import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
+/**
+ * 直线类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class Line extends Shape2D {
     public Line(Vector<Vertex> vertices) {
         super(vertices);
@@ -27,6 +33,11 @@ public class Line extends Shape2D {
         return path;
     }
 
+    /**
+     * 是否需要填充绘制
+     * <p>不需要填充绘制，恒返回false
+     * @return false
+     */
     @Override
     public boolean isFill(){
         return false;

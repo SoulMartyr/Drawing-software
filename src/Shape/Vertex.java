@@ -1,5 +1,11 @@
 package Shape;
 
+/**
+ * 点类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class Vertex {
     private int _x, _y;
 

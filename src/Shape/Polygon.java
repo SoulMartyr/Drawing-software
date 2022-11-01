@@ -1,11 +1,16 @@
 package Shape;
 
-import UI.Function;
 
 import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
+/**
+ * 多边形类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class Polygon extends Shape2D {
     private int _polygonNum;
 

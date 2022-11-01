@@ -4,7 +4,20 @@ import Shape.*;
 
 import java.util.Vector;
 
+/**
+ * 组件类
+ * <p>统一管理涉及绘制时监听器的Switch判断
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class utils {
+    /**
+     * ActionPerformed Switch
+     *
+     * @param vertices 顶点数组
+     * @param func     当前绘制图形
+     * @return {@link Shape2D}
+     */
     public static Shape2D ActionSwitch(Vector<Vertex> vertices, Function func) {
         switch (func) {
             case Line -> {
@@ -41,6 +54,15 @@ public class utils {
         return null;
     }
 
+    /**
+     * MousePressed Switch
+     *
+     * @param shape2D    图形基类
+     * @param func       当前绘制图形
+     * @param shape2DVec 记录已绘制图形的数组
+     * @param x          x坐标
+     * @param y          y坐标
+     */
     public static void PressedSwitch(Shape2D shape2D, Function func, Vector<Shape2D> shape2DVec, int x, int y) {
         switch (func) {
             case Line, Circle -> {
@@ -88,52 +110,52 @@ public class utils {
         }
     }
 
+    /**
+     * MouseReleased Switch
+     *
+     * @param shape2D    图形基类
+     * @param func       当前绘制图形
+     * @param shape2DVec 记录已绘制图形的数组
+     * @param x          x坐标
+     * @param y          y坐标
+     */
     public static void ReleasedSwitch(Shape2D shape2D, Function func, Vector<Shape2D> shape2DVec, int x, int y) {
         switch (func) {
             case Line, Circle, Brush, Eraser -> {
-                //shape2D.changeVertex(1, x, y);
                 shape2DVec.add(shape2D.cloneShape2D());
                 shape2D.clear();
             }
             case Triangle, RightTriangle, Quad -> {
                 if (shape2D.getVerticesNum() == 2) {
-                    //shape2D.changeVertex(1, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                 }
                 if (shape2D.getVerticesNum() == 3) {
-                    //shape2D.changeVertex(2, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                     shape2D.clear();
                 }
             }
             case Rectangle -> {
                 if (shape2D.getVerticesNum() == 2) {
-                    //shape2D.changeVertex(1, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                 }
                 if (shape2D.getVerticesNum() == 4) {
-                    //shape2D.changeVertex(2, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                     shape2D.clear();
                 }
             }
             case RoundedRectangle -> {
                 if (shape2D.getVerticesNum() == 2) {
-                    // shape2D.changeVertex(1, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                 }
                 if (shape2D.getVerticesNum() == 4) {
-                    // shape2D.changeVertex(2, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                 }
                 if (shape2D.getVerticesNum() == 5) {
-                    //shape2D.changeVertex(4, x, y);
                     shape2DVec.add(shape2D.cloneShape2D());
                     shape2D.clear();
                 }
             }
             case Polygon -> {
-                //shape2D.changeVertex(shape2D.getVerticesNum() - 1, x, y);
                 if (shape2D.getVerticesNum() == Function.Polygon.getVerticesNum()) {
                     shape2DVec.add(shape2D.cloneShape2D());
                     shape2D.clear();
@@ -144,6 +166,14 @@ public class utils {
     }
 
 
+    /**
+     * MouseDragged Switch
+     *
+     * @param shape2D    图形基类
+     * @param func       当前绘制图形
+     * @param x          x坐标
+     * @param y          y坐标
+     */
     public static void DraggedSwitch(Shape2D shape2D, Function func, int x, int y) {
         switch (func) {
             case Line, Circle -> {

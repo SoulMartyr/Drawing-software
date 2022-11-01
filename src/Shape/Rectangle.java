@@ -4,6 +4,12 @@ import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
+/**
+ * 矩形类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class Rectangle extends Shape2D {
     public Rectangle(Vector<Vertex> vertices) {
         super(vertices);
@@ -43,6 +49,10 @@ public class Rectangle extends Shape2D {
     }
 
 
+    /**
+     * 计算第三个顶点
+     * <p>第一个顶点与第三个顶点分别与第二个顶点的连线恒垂直
+     */
     protected void calThirdVerTex() {
         int x1 = _vertices.get(0).getX(), y1 = _vertices.get(0).getY();
         int x2 = _vertices.get(1).getX(), y2 = _vertices.get(1).getY();
@@ -51,7 +61,10 @@ public class Rectangle extends Shape2D {
         _vertices.get(2).setXY(x3, y3);
     }
 
-
+    /**
+     * 计算第四个顶点
+     * <p>利用矩形对角线中点相等计算
+     */
     protected void calForthVerTex() {
         int x = 0, y = 0;
         for (int i = 0; i < 3; i++) {

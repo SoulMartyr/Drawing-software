@@ -4,6 +4,12 @@ import java.awt.Color;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
+/**
+ * 三角形类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class Triangle extends Shape2D {
     public Triangle(Vector<Vertex> vertices) {
         super(vertices);

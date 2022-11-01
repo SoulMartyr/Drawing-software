@@ -4,6 +4,12 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
+/**
+ * 直角三角形类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class RightTriangle extends Shape2D {
     public RightTriangle(Vector<Vertex> vertices) {
         super(vertices);
@@ -34,6 +40,10 @@ public class RightTriangle extends Shape2D {
         return new RightTriangle(_vertices, _verticesNum, _lineWidth, _drawColor, _isFill, _fillColor);
     }
 
+    /**
+     * 计算第三个顶点
+     * <p>第一个顶点与第三个顶点分别与第二个顶点的连线恒垂直
+     */
     private void calThirdVerTex() {
         int x1 = _vertices.get(0).getX(), y1 = _vertices.get(0).getY();
         int x2 = _vertices.get(1).getX(), y2 = _vertices.get(1).getY();

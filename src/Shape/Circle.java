@@ -5,6 +5,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.util.Vector;
 
+/**
+ * 圆类
+ *
+ * @author Liu
+ * @date 2022/11/01
+ */
 public class Circle extends Shape2D {
     public Circle(Vector<Vertex> vertices) {
         super(vertices);

@@ -3,14 +3,15 @@ package App;
 import UI.MainUI;
 
 /**
- * @author LiuJiayuan
- * @version 1.0
+ * 主函数
+ *
+ * @author Liu
+ * @date 2022/11/01
  */
 public class Main {
     /**
      * 程序入口
      */
-
     public static void main(String[] args) {
 
         try {

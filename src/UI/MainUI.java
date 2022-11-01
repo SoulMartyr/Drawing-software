@@ -10,47 +10,113 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.security.PublicKey;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.IntStream;
 
 import Shape.*;
 
+
 /**
- * @author LiuJiayuan
- * @version 1.0
+ * 主界面
+ *
+ * @author Liu
+ * @date 2022/11/01
  */
 public class MainUI extends JFrame {
+    /**
+     * 菜单栏
+     */
     private JMenuBar _menubar;
+    /**
+     * 文件栏、操作栏
+     */
     private JMenu _menuFile, _menuOperate;
+    /**
+     * 打开、保存、撤回、重做、设置背景颜色、清屏
+     */
     private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuBgColor,_menuClear;
+    /**
+     * 菜单项功能数组
+     */
     private Vector<JMenuItem> _menuItemVec;
 
+    /**
+     * 工具栏
+     */
     private JToolBar _toolBar;
+    /**
+     * 按钮：直线、二次曲线、三角行、直角三角行、矩形、圆角矩形、圆形、多边形、画笔、橡皮擦、绘制颜色选择、绘制颜色浏览、填充颜色选择、线宽选择、填充颜色浏览
+     */
     private JButton _btnLine, _btnQuad, _btnTriangle, _btnRightTriangle, _btnRectangle, _btnRoundedRectangle,
             _btnCircle, _btnPolygon, _btnBrush, _btnEraser, _btnDrawColorChooser, _drawColorViewer, _btnFillColorChooser, _btnLineWidth, _fillColorViewer;
+    /**
+     * 是否填充绘制
+     */
     private JCheckBox _btnFill;
+    /**
+     * 工具栏按钮数组
+     */
     private Vector<JButton> _toolBtnVec;
 
+    /**
+     * 容器
+     */
     private Container _container;
+    /**
+     * 画布布局
+     */
     private JPanel _canvasPanel;
+    /**
+     * 画布
+     */
     private Canvas _canvas;
 
+    /**
+     * 功能
+     */
     private Function _func;
+    /**
+     * 顶点数组
+     */
     private Vector<Vertex> _vertices;
+    /**
+     * 双缓存策略
+     */
     private BufferStrategy _strategy;
+    /**
+     * 图形基类
+     */
     private Shape2D _shape2D;
+    /**
+     * 已绘制图形数组
+     */
     private Vector<Shape2D> _shape2DVec;
+    /**
+     * 线宽
+     */
     private int _lineWidth;
+    /**
+     * 是否填充绘制
+     */
     private boolean _isFill;
+    /**
+     * 绘制颜色、背景颜色、填充颜色
+     */
     private Color _cvColor, _bgColor, _fillColor;
+    /**
+     * 上一个被按下的按钮、用于按钮间按下样式设置
+     */
     private JButton _preBtn;
+    /**
+     * 已绘制图形数组的索引、用于撤销与重做
+     */
     private int _vecIndex;
+    /**
+     * 是否按下shift键
+     */
     private boolean isShifted;
 
     /**
-     * 初始化窗口与控件
+     * 初始化窗口、控件与监听器
      */
     public MainUI() {
         super("Painting");
@@ -68,6 +134,7 @@ public class MainUI extends JFrame {
     /**
      * 依据屏幕大小初始化窗口大小<br>
      * 窗口位于屏幕中心且长宽均为屏幕长宽的0.75
+     * 初始化图标
      */
     private void InitSizeAndPosAndIcon() {
         Toolkit toolKit = Toolkit.getDefaultToolkit();
@@ -113,7 +180,9 @@ public class MainUI extends JFrame {
 
         setJMenuBar(_menubar);
     }
-
+    /**
+     * 初始化工具栏
+     */
     private void InitToolBar() {
         String[] _toolBtnStr = {"Brush", "Line", "Quad", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
                 "Circle", "Polygon", "Eraser", "LineWidth", "DrawColorChooser","DrawColorViewer","FillColorChooser","FillColorViewer"};
@@ -225,6 +294,11 @@ public class MainUI extends JFrame {
 
     }
 
+
+    /**
+     * 初始化画布
+     * <p>同时初始化绘制时的参数
+     */
     private void InitCanvas() {
         _canvasPanel = new JPanel();
         _canvasPanel.setLayout(new GridLayout());
@@ -260,12 +334,19 @@ public class MainUI extends JFrame {
 
     }
 
+    /**
+     * 初始化菜单功能监听器
+     */
     private void InitMenuListener() {
         for (JMenuItem jMenuItem : _menuItemVec) {
             jMenuItem.addActionListener(new MenuItemListener());
         }
     }
 
+    /**
+     * 初始化工具栏按钮监听器
+     * <p>按下每个按钮后实现不同绘制功能与参数的设置
+     */
     private void InitBtnListener() {
         for (JButton btn : _toolBtnVec) {
             btn.addActionListener(new BtnListener());
@@ -278,6 +359,10 @@ public class MainUI extends JFrame {
         });
     }
 
+    /**
+     * 初始化画布监听器
+     * <p>初始化双缓存策略，并加入对鼠标与键盘的监听
+     */
     private void InitCanvasListener() {
         _canvas.createBufferStrategy(2);
         _strategy = _canvas.getBufferStrategy();
@@ -288,6 +373,12 @@ public class MainUI extends JFrame {
         _btnLine.setEnabled(false);
     }
 
+    /**
+     * 绘制图形
+     *
+     * @param graphics2D graphics2d，调用其draw方法实现多态
+     * @param shape2D    图形基类
+     */
     private void PaintShape2D(Graphics2D graphics2D, Shape2D shape2D) {
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         graphics2D.setColor(shape2D.getDrawColor());
@@ -300,6 +391,12 @@ public class MainUI extends JFrame {
         }
     }
 
+    /**
+     * 菜单栏监听器
+     *
+     * @author Liu
+     * @date 2022/11/02
+     */
     private class MenuItemListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -381,6 +478,12 @@ public class MainUI extends JFrame {
         }
     }
 
+    /**
+     * 工具栏监听器
+     *
+     * @author Liu
+     * @date 2022/11/02
+     */
     private class BtnListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -426,6 +529,12 @@ public class MainUI extends JFrame {
         }
     }
 
+    /**
+     * 画布鼠标功能监听器
+     *
+     * @author Liu
+     * @date 2022/11/02
+     */
     private class CanvasMouseListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -514,6 +623,12 @@ public class MainUI extends JFrame {
         }
     }
 
+    /**
+     * 画布键盘功能监听器
+     *
+     * @author Liu
+     * @date 2022/11/02
+     */
     private class CanvasKeyListener extends KeyAdapter{
         @Override
         public void keyPressed(KeyEvent e){
