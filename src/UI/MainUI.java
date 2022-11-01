@@ -10,7 +10,10 @@ import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.security.PublicKey;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 import Shape.*;
 
@@ -44,13 +47,14 @@ public class MainUI extends JFrame {
     private Color _cvColor, _bgColor, _fillColor;
     private JButton _preBtn;
     private int _vecIndex;
+    private boolean isShifted;
 
     /**
      * 初始化窗口与控件
      */
     public MainUI() {
         super("Painting");
-        InitSizeAndPos();
+        InitSizeAndPosAndIcon();
         InitMenuBar();
         InitToolBar();
         InitCanvas();
@@ -65,13 +69,14 @@ public class MainUI extends JFrame {
      * 依据屏幕大小初始化窗口大小<br>
      * 窗口位于屏幕中心且长宽均为屏幕长宽的0.75
      */
-    private void InitSizeAndPos() {
+    private void InitSizeAndPosAndIcon() {
         Toolkit toolKit = Toolkit.getDefaultToolkit();
         Dimension screenDimension = toolKit.getScreenSize();
         double width = screenDimension.getWidth();
         double height = screenDimension.getHeight();
         setSize((int) width * 3 / 4, (int) height * 3 / 4);
         setLocationRelativeTo(null);
+        setIconImage(new ImageIcon(MainUI.class.getResource("/Icon/Painting.png")).getImage());
     }
 
     /**
@@ -247,6 +252,7 @@ public class MainUI extends JFrame {
         _fillColor = Color.BLACK;
 
         _vecIndex = 0;
+        isShifted =false;
 
 
     }
@@ -272,20 +278,21 @@ public class MainUI extends JFrame {
     private void InitCanvasListener() {
         _canvas.createBufferStrategy(2);
         _strategy = _canvas.getBufferStrategy();
-        _canvas.addMouseListener(new CanvasListener());
-        _canvas.addMouseMotionListener(new CanvasListener());
+        _canvas.addMouseListener(new CanvasMouseListener());
+        _canvas.addMouseMotionListener(new CanvasMouseListener());
+        _canvas.addKeyListener(new CanvasKeyListener());
         _btnLine.doClick();
         _btnLine.setEnabled(false);
     }
 
     private void PaintShape2D(Graphics2D graphics2D, Shape2D shape2D) {
         graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics2D.setColor(shape2D.GetDrawColor());
-        graphics2D.setStroke(new BasicStroke(shape2D.GetLineWidth()));
+        graphics2D.setColor(shape2D.getDrawColor());
+        graphics2D.setStroke(new BasicStroke(shape2D.getLineWidth()));
         GeneralPath path = shape2D.generatePath();
         graphics2D.draw(path);
         if(shape2D.isFill()){
-            graphics2D.setColor(shape2D.GetFillColor());
+            graphics2D.setColor(shape2D.getFillColor());
             graphics2D.fill(path);
         }
     }
@@ -387,7 +394,7 @@ public class MainUI extends JFrame {
                             "Input LineWidth", JOptionPane.QUESTION_MESSAGE);
                     try {
                         _lineWidth = Integer.parseInt(strLineWidth);
-                        _shape2D.SetLineWidth(_lineWidth);
+                        _shape2D.setLineWidth(_lineWidth);
                     } catch (NullPointerException | NumberFormatException ne) {
                         ne.printStackTrace();
                     }
@@ -397,7 +404,7 @@ public class MainUI extends JFrame {
 
                     _cvColor = color;
                     _drawColorViewer.setBackground(color);
-                    _shape2D.SetDrawColor(_cvColor);
+                    _shape2D.setDrawColor(_cvColor);
                 }
                 case "FillColorChooser" -> {
                     Color color = JColorChooser.showDialog(null, "Select a color", _cvColor);
@@ -409,7 +416,7 @@ public class MainUI extends JFrame {
         }
     }
 
-    private class CanvasListener extends MouseAdapter {
+    private class CanvasMouseListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == 3 && _func == Function.Polygon) {
@@ -438,16 +445,16 @@ public class MainUI extends JFrame {
                     _shape2D.clear();
                 }
 
-                _shape2D.SetLineWidth(_lineWidth);
-                _shape2D.SetFill(_isFill);
-                _shape2D.SetFillColor(_fillColor);
+                _shape2D.setLineWidth(_lineWidth);
+                _shape2D.setFill(_isFill);
+                _shape2D.setFillColor(_fillColor);
 
                 utils.PressedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
 
                 if (_func == Function.Eraser)
-                    _shape2D.SetDrawColor(_bgColor);
+                    _shape2D.setDrawColor(_bgColor);
                 else
-                    _shape2D.SetDrawColor(_cvColor);
+                    _shape2D.setDrawColor(_cvColor);
 
             } catch (NullPointerException npe) {
                 npe.printStackTrace();
@@ -481,6 +488,8 @@ public class MainUI extends JFrame {
                         }
 
                         utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
+                        if(isShifted)
+                            _shape2D.correctVertex();
                         PaintShape2D(graphics, _shape2D);
 
                         graphics.dispose();
@@ -489,8 +498,27 @@ public class MainUI extends JFrame {
                     _strategy.show();
 
                 } while (_strategy.contentsLost());
-            } catch (NullPointerException npe) {
-                npe.printStackTrace();
+            } catch (NullPointerException |ArrayIndexOutOfBoundsException nae) {
+                nae.printStackTrace();
+            }
+        }
+    }
+
+    private class CanvasKeyListener extends KeyAdapter{
+        @Override
+        public void keyPressed(KeyEvent e){
+            if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+                isShifted = true;
+            }
+        }
+        public void keyReleased(KeyEvent e){
+            if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+                try {
+                    Thread.sleep(250);
+                } catch (InterruptedException interruptedException) {
+                    interruptedException.printStackTrace();
+                }
+                isShifted = false;
             }
         }
     }

@@ -40,36 +40,36 @@ public class Shape2D {
         return null;
     }
 
-    public void AddVertex(int x, int y) {
+    public void addVertex(int x, int y) {
         _verticesNum += 1;
         _vertices.add(new Vertex(x, y));
     }
 
-    public void ChangeVertex(int index, int x, int y) {
-        _vertices.set(index, new Vertex(x, y));
+    public void changeVertex(int index, int x, int y) {
+        _vertices.get(index).setXY(x, y);
     }
 
-    public int GetVerticesNum() {
+    public int getVerticesNum() {
         return _verticesNum;
     }
 
-    public void SetLineWidth(int lineWidth) {
+    public void setLineWidth(int lineWidth) {
         _lineWidth = lineWidth;
     }
 
-    public int GetLineWidth() {
+    public int getLineWidth() {
         return _lineWidth;
     }
 
-    public void SetDrawColor(Color color) {
+    public void setDrawColor(Color color) {
         _drawColor = color;
     }
 
-    public Color GetDrawColor() {
+    public Color getDrawColor() {
         return _drawColor;
     }
 
-    public void SetFill(boolean isFill) {
+    public void setFill(boolean isFill) {
         _isFill = isFill;
     }
 
@@ -77,14 +77,27 @@ public class Shape2D {
         return _isFill;
     }
 
-    public void SetFillColor(Color color) {
+    public void setFillColor(Color color) {
         _fillColor = color;
     }
 
-    public Color GetFillColor() {
+    public Color getFillColor() {
         return _fillColor;
     }
 
+    public void correctVertex() {
+        int index = _verticesNum - 1;
+        int x1 = _vertices.get(index - 1).getX();
+        int y1 = _vertices.get(index - 1).getY();
+        int x2 = _vertices.get(index).getX();
+        int y2 = _vertices.get(index).getY();
+        if (Math.abs(x1 - x2) < Math.abs(y1 - y2)) {
+            _vertices.get(index).setX(x1);
+        } else {
+            _vertices.get(index).setY(y1);
+        }
+
+    }
 
     public Shape2D cloneShape2D() {
         return new Shape2D(_vertices, _verticesNum);

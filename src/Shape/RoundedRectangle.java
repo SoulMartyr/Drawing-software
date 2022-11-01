@@ -23,8 +23,8 @@ public class RoundedRectangle extends Rectangle {
         } else if (_verticesNum == 4) {
             path = new Rectangle(_vertices, _verticesNum).generatePath();
         } else if (_verticesNum == 5) {
-            _vertices.set(2, calThirdVerTex());
-            _vertices.set(3, calForthVerTex());
+            calThirdVerTex();
+            calForthVerTex();
 
             RoundRectangle2D roundRectangle = new RoundRectangle2D.Double();
 

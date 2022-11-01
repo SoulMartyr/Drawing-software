@@ -20,7 +20,7 @@ public class RightTriangle extends Shape2D {
             path = new Line(_vertices, _verticesNum).generatePath();
         }
         if (_verticesNum == 3) {
-            _vertices.set(2, calThirdVerTex());
+            calThirdVerTex();
             path.moveTo(_vertices.get(0).getX(), _vertices.get(0).getY());
             path.lineTo(_vertices.get(1).getX(), _vertices.get(1).getY());
             path.lineTo(_vertices.get(2).getX(), _vertices.get(2).getY());
@@ -34,11 +34,11 @@ public class RightTriangle extends Shape2D {
         return new RightTriangle(_vertices, _verticesNum, _lineWidth, _drawColor, _isFill, _fillColor);
     }
 
-    private Vertex calThirdVerTex() {
+    private void calThirdVerTex() {
         int x1 = _vertices.get(0).getX(), y1 = _vertices.get(0).getY();
         int x2 = _vertices.get(1).getX(), y2 = _vertices.get(1).getY();
         int x3 = _vertices.get(2).getX();
         int y3 = (int) ((x3 - x2) * (x1 - x2) / (y2 - y1) + y2);
-        return new Vertex(x3, y3);
+        _vertices.get(2).setXY(x3, y3);
     }
 }
