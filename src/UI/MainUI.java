@@ -33,7 +33,7 @@ public class MainUI extends JFrame {
     /**
      * 打开、保存、撤回、重做、设置背景颜色、清屏
      */
-    private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuBgColor,_menuClear;
+    private JMenuItem _menuOpen, _menuSave, _menuCancel, _menuRedo, _menuBgColor, _menuClear;
     /**
      * 菜单项功能数组
      */
@@ -90,6 +90,7 @@ public class MainUI extends JFrame {
      * 已绘制图形数组
      */
     private Vector<Shape2D> _shape2DVec;
+    private BufferedImage _bgImage;
     /**
      * 线宽
      */
@@ -114,6 +115,7 @@ public class MainUI extends JFrame {
      * 是否按下shift键
      */
     private boolean isShifted;
+
 
     /**
      * 初始化窗口、控件与监听器
@@ -180,12 +182,13 @@ public class MainUI extends JFrame {
 
         setJMenuBar(_menubar);
     }
+
     /**
      * 初始化工具栏
      */
     private void InitToolBar() {
         String[] _toolBtnStr = {"Brush", "Line", "Quad", "Triangle", "RightTriangle", "Rectangle", "RoundedRectangle",
-                "Circle", "Polygon", "Eraser", "LineWidth", "DrawColorChooser","DrawColorViewer","FillColorChooser","FillColorViewer"};
+                "Circle", "Polygon", "Eraser", "LineWidth", "DrawColorChooser", "DrawColorViewer", "FillColorChooser", "FillColorViewer"};
 
         _toolBtnVec = new Vector<>();
         //绘图类
@@ -236,7 +239,7 @@ public class MainUI extends JFrame {
         _btnFillColorChooser.setToolTipText("Set color of fill.");
 
         _btnFill = new JCheckBox("Fill");
-        _btnFill.setSize(32,32);
+        _btnFill.setSize(32, 32);
         _btnFill.setFont(new Font("宋体", 0, 16));
 
         for (int i = 0; i < _toolBtnVec.size(); i++) {
@@ -277,7 +280,7 @@ public class MainUI extends JFrame {
                     _toolBar.add(new JLabel("Current Draw Color"));
                     _toolBar.addSeparator();
                 }
-                case "FillColorChooser" ->{
+                case "FillColorChooser" -> {
                     _toolBar.addSeparator();
                     _toolBar.add(_btnFill);
                     _toolBar.addSeparator();
@@ -322,6 +325,7 @@ public class MainUI extends JFrame {
         _func = Function.Line;
         _preBtn = _btnLine;
 
+        _bgImage = null;
         _lineWidth = 4;
         _cvColor = Color.BLACK;
         _bgColor = Color.WHITE;
@@ -329,7 +333,7 @@ public class MainUI extends JFrame {
         _fillColor = Color.BLACK;
 
         _vecIndex = 0;
-        isShifted =false;
+        isShifted = false;
 
 
     }
@@ -385,7 +389,7 @@ public class MainUI extends JFrame {
         graphics2D.setStroke(new BasicStroke(shape2D.getLineWidth()));
         GeneralPath path = shape2D.generatePath();
         graphics2D.draw(path);
-        if(shape2D.isFill()){
+        if (shape2D.isFill()) {
             graphics2D.setColor(shape2D.getFillColor());
             graphics2D.fill(path);
         }
@@ -409,10 +413,12 @@ public class MainUI extends JFrame {
                     if (result == JFileChooser.APPROVE_OPTION) {
                         File file = fileChooser.getSelectedFile();
                         try {
-                            BufferedImage image = ImageIO.read(file);//获取图片
+                            _bgImage = ImageIO.read(file);//获取图片
                             Graphics g = _canvas.getGraphics();
-                            g.drawImage(image, 0, 0, _canvas.getWidth(), _canvas.getHeight(), MainUI.this);
+                            g.drawImage(_bgImage, 0, 0, _canvas.getWidth(), _canvas.getHeight(), MainUI.this);
+                            _shape2DVec.clear();
                         } catch (IOException ioe) {
+                            JOptionPane.showMessageDialog(null, ioe.toString(), "error", JOptionPane.ERROR_MESSAGE);
                             ioe.printStackTrace();
                         }
                     }
@@ -438,6 +444,7 @@ public class MainUI extends JFrame {
                         try {
                             ImageIO.write(img, "png", file);
                         } catch (IOException ioe) {
+                            JOptionPane.showMessageDialog(null, ioe.toString(), "error", JOptionPane.ERROR_MESSAGE);
                             ioe.printStackTrace();
                         }
                     }
@@ -460,18 +467,24 @@ public class MainUI extends JFrame {
                         iobe.printStackTrace();
                     }
                 }
-                case"Background Color" ->{
+                case "Background Color" -> {
                     Color color = JColorChooser.showDialog(MainUI.this, "Select a color", _cvColor);
 
                     _bgColor = color;
                     _canvas.setBackground(color);
+
+                    for (Shape2D shape2D : _shape2DVec) {
+                        if (shape2D instanceof Eraser)
+                            shape2D.setDrawColor(_bgColor);
+                    }
                 }
-                case"All Clear" ->{
-                    Graphics g =_canvas.getGraphics();
+                case "All Clear" -> {
+                    Graphics g = _canvas.getGraphics();
                     g.setColor(_bgColor);
                     g.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
                     _shape2DVec.clear();
                     _vecIndex = 0;
+                    _bgImage = null;
                 }
 
             }
@@ -509,6 +522,7 @@ public class MainUI extends JFrame {
                         _lineWidth = Integer.parseInt(strLineWidth);
                         _shape2D.setLineWidth(_lineWidth);
                     } catch (NullPointerException | NumberFormatException ne) {
+                        JOptionPane.showMessageDialog(null, ne.toString(), "error", JOptionPane.ERROR_MESSAGE);
                         ne.printStackTrace();
                     }
                 }
@@ -545,6 +559,7 @@ public class MainUI extends JFrame {
                     Function.Polygon.setVerticesNum(Integer.parseInt(strVerticesNum));
                     _shape2D = utils.ActionSwitch(_vertices, _func);
                 } catch (NullPointerException | NumberFormatException ne) {
+                    JOptionPane.showMessageDialog(null, ne.toString(), "error", JOptionPane.ERROR_MESSAGE);
                     ne.printStackTrace();
                 }
             }
@@ -553,7 +568,7 @@ public class MainUI extends JFrame {
 
         @Override
         public void mousePressed(MouseEvent e) {
-            if(e.getButton() != 1) return;
+            if (e.getButton() != 1) return;
             super.mousePressed(e);
             try {
                 int count = _shape2DVec.size() - _vecIndex;
@@ -576,6 +591,7 @@ public class MainUI extends JFrame {
                     _shape2D.setDrawColor(_cvColor);
 
             } catch (NullPointerException npe) {
+                JOptionPane.showMessageDialog(null, npe.toString(), "error", JOptionPane.ERROR_MESSAGE);
                 npe.printStackTrace();
             }
         }
@@ -583,12 +599,13 @@ public class MainUI extends JFrame {
 
         @Override
         public void mouseReleased(MouseEvent e) {
-            if(e.getButton() != 1) return;
+            if (e.getButton() != 1) return;
             super.mouseReleased(e);
             try {
                 utils.ReleasedSwitch(_shape2D, _func, _shape2DVec, e.getX(), e.getY());
                 _vecIndex = _shape2DVec.size();
             } catch (NullPointerException npe) {
+                JOptionPane.showMessageDialog(null, npe.toString(), "error", JOptionPane.ERROR_MESSAGE);
                 npe.printStackTrace();
             }
         }
@@ -602,12 +619,16 @@ public class MainUI extends JFrame {
                         Graphics2D graphics = (Graphics2D) _strategy.getDrawGraphics();
 
                         graphics.clearRect(0, 0, _canvas.getWidth(), _canvas.getHeight());
+
+                        if (_bgImage != null)
+                            graphics.drawImage(_bgImage, 0, 0, _canvas.getWidth(), _canvas.getHeight(), MainUI.this);
+
                         for (Shape2D shape2D : _shape2DVec) {
                             PaintShape2D(graphics, shape2D);
                         }
 
                         utils.DraggedSwitch(_shape2D, _func, e.getX(), e.getY());
-                        if(isShifted)
+                        if (isShifted)
                             _shape2D.correctVertex();
                         PaintShape2D(graphics, _shape2D);
 
@@ -617,7 +638,8 @@ public class MainUI extends JFrame {
                     _strategy.show();
 
                 } while (_strategy.contentsLost());
-            } catch (NullPointerException |ArrayIndexOutOfBoundsException nae) {
+            } catch (NullPointerException | ArrayIndexOutOfBoundsException nae) {
+                JOptionPane.showMessageDialog(null, nae.toString(), "error", JOptionPane.ERROR_MESSAGE);
                 nae.printStackTrace();
             }
         }
@@ -629,19 +651,21 @@ public class MainUI extends JFrame {
      * @author Liu
      * @date 2022/11/02
      */
-    private class CanvasKeyListener extends KeyAdapter{
+    private class CanvasKeyListener extends KeyAdapter {
         @Override
-        public void keyPressed(KeyEvent e){
-            if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                 isShifted = true;
             }
         }
-        public void keyReleased(KeyEvent e){
-            if(e.getKeyCode() == KeyEvent.VK_SHIFT){
+
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
                 try {
                     Thread.sleep(250);
-                } catch (InterruptedException interruptedException) {
-                    interruptedException.printStackTrace();
+                } catch (InterruptedException ie) {
+                    JOptionPane.showMessageDialog(null, ie.toString(), "error", JOptionPane.ERROR_MESSAGE);
+                    ie.printStackTrace();
                 }
                 isShifted = false;
             }
